@@ -3,12 +3,15 @@ import { autoinject, LogManager, View } from 'aurelia-framework';
 import { RouterConfiguration, Router, RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 
+
 export const log = LogManager.getLogger('app.App');
 
 @autoinject
 export class App {
     router?: Router;
     private subscriptions: Subscription[] = [];
+
+    map?: L.Map;
 
     // ================================= view lifecycle ===============================
     created(owningView: View, myView: View): void {
@@ -57,7 +60,7 @@ export class App {
         this.router = router;
         config.title = 'SportMap';
         config.map([
-            {route: ['','home'], name: 'home', moduleId: PLATFORM.moduleName('views/home/index'), nav: true, title: 'Home'},
+            { route: ['', 'home'], name: 'home', moduleId: PLATFORM.moduleName('views/home/index'), nav: true, title: 'Home' },
         ]);
 
         config.mapUnknownRoutes('views/home/index');
