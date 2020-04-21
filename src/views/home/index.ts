@@ -23,17 +23,22 @@ export class HomeIndex {
     map!: L.Map;
 
     gpsSessions: IGpsSession[] = [];
+    gpsLocations: IGpsLocation[] = [];
+
     @observable
     selectedGpsSession: IGpsSession | null = null;
+    showCp = true;
+    showWp = true;
 
-    gpsLocations: IGpsLocation[] = [];
-    viewportHeight =  Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    trackLength = 0;
+
+    viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
     viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
     constructor(private gpsSessionService: GpsSessionService, private gpsLocationService: GpsLocationService) {
 
 
-        
+
     }
 
     // ================================= view lifecycle ===============================
@@ -47,10 +52,10 @@ export class HomeIndex {
 
     attached(): void {
         log.debug("attached");
-        
+
         const elem = document.querySelector('#map');
-        if (elem){
-            elem.setAttribute('style','height: ' + (this.viewportHeight * .8).toString() + 'px;');
+        if (elem) {
+            elem.setAttribute('style', 'height: ' + (this.viewportHeight * .8).toString() + 'px;');
         }
 
 
@@ -129,49 +134,57 @@ export class HomeIndex {
 
         const iconWp = L.icon({
             iconUrl: '/marker-icon-wp.png',
-            iconSize:     [25, 41], // size of the icon
-            iconAnchor:   [13, 41], // point of the icon which will correspond to marker's location
+            iconSize: [25, 41], // size of the icon
+            iconAnchor: [13, 41], // point of the icon which will correspond to marker's location
         });
 
         const iconCp = L.icon({
             iconUrl: '/marker-icon-cp.png',
-            iconSize:     [25, 41], // size of the icon
-            iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+            iconSize: [25, 41], // size of the icon
+            iconAnchor: [13, 41], // point of the icon which will correspond to marker's location
         });
         const iconS = L.icon({
             iconUrl: '/marker-icon-s.png',
-            iconSize:     [25, 41], // size of the icon
-            iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+            iconSize: [25, 41], // size of the icon
+            iconAnchor: [13, 41], // point of the icon which will correspond to marker's location
         });
         const iconF = L.icon({
             iconUrl: '/marker-icon-f.png',
-            iconSize:     [25, 41], // size of the icon
-            iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+            iconSize: [25, 41], // size of the icon
+            iconAnchor: [13, 41], // point of the icon which will correspond to marker's location
         });
 
 
         const polylinePoints: L.LatLngExpression[] = [];
-        this.gpsLocations.forEach(location => {
+        this.trackLength = 0;
+
+        this.gpsLocations.forEach((location, index) => {
             polylinePoints.push([location.latitude, location.longitude]);
 
-            if (location.gpsLocationTypeId == GpsLocationTypes.wayPoint) {
+            if (index > 0) {
+                this.trackLength = this.trackLength + this.distance(
+                    this.gpsLocations[index - 1].latitude, this.gpsLocations[index - 1].longitude,
+                    location.latitude, location.longitude);
+            }
+
+            if (location.gpsLocationTypeId == GpsLocationTypes.wayPoint && this.showWp) {
                 log.debug('adding wp  to ', [location.latitude, location.longitude])
-                L.marker([location.latitude, location.longitude], {icon: iconWp}).addTo(this.map);
+                L.marker([location.latitude, location.longitude], { icon: iconWp }).addTo(this.map);
             } else
-                if (location.gpsLocationTypeId == GpsLocationTypes.checkPoint) {
+                if (location.gpsLocationTypeId == GpsLocationTypes.checkPoint && this.showCp) {
                     log.debug('adding cp to ', [location.latitude, location.longitude])
-                    L.marker([location.latitude, location.longitude], {icon: iconCp}).addTo(this.map);
+                    L.marker([location.latitude, location.longitude], { icon: iconCp }).addTo(this.map);
                 }
 
         });
 
         // add start marker
-        if (polylinePoints.length>0){
-            L.marker([this.gpsLocations[0].latitude, this.gpsLocations[0].longitude], {icon: iconS}).addTo(this.map);
+        if (polylinePoints.length > 0) {
+            L.marker([this.gpsLocations[0].latitude, this.gpsLocations[0].longitude], { icon: iconS }).addTo(this.map);
         }
         // add finish marker
-        if (polylinePoints.length>1){
-            L.marker([this.gpsLocations[this.gpsLocations.length-1].latitude, this.gpsLocations[this.gpsLocations.length-1].longitude], {icon: iconF}).addTo(this.map);
+        if (polylinePoints.length > 1) {
+            L.marker([this.gpsLocations[this.gpsLocations.length - 1].latitude, this.gpsLocations[this.gpsLocations.length - 1].longitude], { icon: iconF }).addTo(this.map);
         }
 
         if (polylinePoints.length > 0) {
@@ -179,6 +192,26 @@ export class HomeIndex {
             this.map.fitBounds(polyline.getBounds());
         }
 
+    }
+
+    distance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+        if ((lat1 == lat2) && (lon1 == lon2)) {
+            return 0;
+        }
+        else {
+            const radlat1 = Math.PI * lat1 / 180;
+            const radlat2 = Math.PI * lat2 / 180;
+            const theta = lon1 - lon2;
+            const radtheta = Math.PI * theta / 180;
+            let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+            if (dist > 1) {
+                dist = 1;
+            }
+            dist = Math.acos(dist);
+            dist = dist * 180 / Math.PI;
+            dist = dist * 60 * 1.853159616;
+            return dist;
+        }
     }
 }
 
