@@ -10,7 +10,6 @@ cache:
 build:
   stage: build
   script:
-    - npm install aurelia-cli -g
     - npm install
     - au build
   tags:
