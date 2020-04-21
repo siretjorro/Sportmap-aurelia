@@ -3,5 +3,6 @@
   "testing": true,
   
   "logLevel": "debug", 
-  "backendUrl" : "http://localhost:5000/api/"
+  "backendUrl" : "https://sportmap.akaver.com/api/v1.0/",
+  "backendUrlLocal" : "http://localhost:5000/api/v1.0/"
 }

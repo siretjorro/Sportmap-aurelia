@@ -1,5 +1,9 @@
+import { IGpsLocation } from './../../domain/IGpsLocation';
+import { GpsLocationService } from './../../services/gpslocation-service';
+import { GpsSessionService } from './../../services/gpssession-service';
+import { IGpsSession } from './../../domain/IGpsSession';
 import { PLATFORM } from 'aurelia-pal';
-import { autoinject, LogManager, View } from 'aurelia-framework';
+import { autoinject, LogManager, View, observable } from 'aurelia-framework';
 import { RouterConfiguration, Router, RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 import * as L from 'leaflet';
@@ -12,14 +16,23 @@ L.Icon.Default.mergeOptions({
     shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
 });
 
-export const log = LogManager.getLogger('app.App');
+export const log = LogManager.getLogger('app.HomeIndex');
 
 @autoinject
 export class HomeIndex {
     private subscriptions: Subscription[] = [];
 
-    map?: L.Map;
+    map!: L.Map;
 
+    gpsSessions: IGpsSession[] = [];
+    @observable
+    selectedGpsSession: IGpsSession | null = null;
+
+    gpsLocations: IGpsLocation[] = [];
+
+    constructor(private gpsSessionService: GpsSessionService, private gpsLocationService: GpsLocationService) {
+
+    }
 
     // ================================= view lifecycle ===============================
     created(owningView: View, myView: View): void {
@@ -42,6 +55,14 @@ export class HomeIndex {
             }
         ).addTo(this.map);
 
+
+        this.gpsSessionService.getAll().then(
+            response => {
+                if (response.data) {
+                    this.gpsSessions = response.data;
+                }
+            }
+        );
     }
 
     detached(): void {
@@ -82,5 +103,28 @@ export class HomeIndex {
     // ================================= Helpers  ===============================
 
 
+    selectedGpsSessionChanged(newValue: IGpsSession, oldValue: IGpsSession): void {
+        log.debug('selectedGpsSessionChanged', newValue, oldValue);
+        if (this.selectedGpsSession) {
+            this.gpsLocationService.getAllForSession(this.selectedGpsSession.id).then(
+                result => {
+                    if (result.data) {
+                        this.gpsLocations = result.data;
+                        this.visualizeSession();
+                    }
+                }
+            );
+        }
+    }
+
+    visualizeSession(): void {
+        const polylinePoints: L.LatLngExpression[] = [];
+        this.gpsLocations.forEach(location => {
+            polylinePoints.push([location.latitude, location.longitude]);
+        });
+
+        const polyline = L.polyline(polylinePoints).addTo(this.map);
+        this.map.fitBounds(polyline.getBounds());
+    }
 }
 
