@@ -1,31 +1,37 @@
 {
-  "compileOnSave": false,
-  "compilerOptions": {
-    "module": "esnext",
-    "skipLibCheck": true,
-    "typeRoots": [
-      "./node_modules/@types"
+    "compileOnSave": false,
+    "compilerOptions": {
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "noFallthroughCasesInSwitch": true,
+        "downlevelIteration": true,
+        "importHelpers": true,
+        "allowSyntheticDefaultImports": true,
+        "module": "esnext",
+        "skipLibCheck": true,
+        "typeRoots": [
+            "./node_modules/@types"
+        ],
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "target": "es5",
+        "lib": [
+            "es2015",
+            "dom"
+        ],
+        "moduleResolution": "node",
+        "baseUrl": "src",
+        "resolveJsonModule": true,
+        "allowJs": true
+    },
+    "include": [
+        "./src/**/*.ts",
+        "./test/**/*.ts",
+        "./types/**/*.d.ts"
     ],
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "sourceMap": true,
-    "target": "es5",
-    "lib": [
-      "es2015",
-      "dom"
-    ],
-    "moduleResolution": "node",
-    "baseUrl": "src",
-    "resolveJsonModule": true,
-    "allowJs": true
-  },
-  "include": [
-    "./src/**/*.ts",
-    "./test/**/*.ts",
-    "./types/**/*.d.ts"
-  ],
-  "atom": {
-    "rewriteTsconfig": false
-  }
+    "atom": {
+        "rewriteTsconfig": false
+    }
 }

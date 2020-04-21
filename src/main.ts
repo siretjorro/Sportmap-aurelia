@@ -2,6 +2,9 @@ import {Aurelia, LogManager} from 'aurelia-framework';
 import * as environment from '../config/environment.json';
 import {PLATFORM} from 'aurelia-pal';
 import { ConsoleAppender } from 'aurelia-logging-console';
+import { ILogLevel } from 'types/ILogLevel';
+import { queryStringValue, validateLogLevel } from 'utils/utils-general';
+import 'whatwg-fetch';
 
 import 'jquery';
 import 'popper.js';
@@ -9,8 +12,6 @@ import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 import '../static/site.css';
-import { ILogLevel } from 'types/ILogLevel';
-import { queryStringValue, validateLogLevel } from 'utils/utils-general';
 
 let logLevel = environment.logLevel;
 const queryLogLevel = queryStringValue('loglevel');
@@ -43,8 +44,6 @@ export function configure(aurelia: Aurelia): void {
   aurelia.use
     .standardConfiguration()
     .feature(PLATFORM.moduleName('resources/index'));
-
-  aurelia.use.developmentLogging(environment.debug ? 'debug' : 'warn');
 
   if (environment.testing) {
     aurelia.use.plugin(PLATFORM.moduleName('aurelia-testing'));
