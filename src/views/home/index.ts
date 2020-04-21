@@ -134,7 +134,17 @@ export class HomeIndex {
         });
 
         const iconCp = L.icon({
-            iconUrl: '/marker-icon-wp.png',
+            iconUrl: '/marker-icon-cp.png',
+            iconSize:     [25, 41], // size of the icon
+            iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+        });
+        const iconS = L.icon({
+            iconUrl: '/marker-icon-s.png',
+            iconSize:     [25, 41], // size of the icon
+            iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+        });
+        const iconF = L.icon({
+            iconUrl: '/marker-icon-f.png',
             iconSize:     [25, 41], // size of the icon
             iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
         });
@@ -154,6 +164,15 @@ export class HomeIndex {
                 }
 
         });
+
+        // add start marker
+        if (polylinePoints.length>0){
+            L.marker([this.gpsLocations[0].latitude, this.gpsLocations[0].longitude], {icon: iconS}).addTo(this.map);
+        }
+        // add finish marker
+        if (polylinePoints.length>1){
+            L.marker([this.gpsLocations[this.gpsLocations.length-1].latitude, this.gpsLocations[this.gpsLocations.length-1].longitude], {icon: iconF}).addTo(this.map);
+        }
 
         if (polylinePoints.length > 0) {
             const polyline = L.polyline(polylinePoints).addTo(this.map);
