@@ -27,9 +27,10 @@ export class HomeIndex {
     selectedGpsSession: IGpsSession | null = null;
 
     gpsLocations: IGpsLocation[] = [];
+    viewportHeight =  Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
     constructor(private gpsSessionService: GpsSessionService, private gpsLocationService: GpsLocationService) {
-
 
 
         
@@ -46,6 +47,12 @@ export class HomeIndex {
 
     attached(): void {
         log.debug("attached");
+        
+        const elem = document.querySelector('#map');
+        if (elem){
+            elem.setAttribute('style','height: ' + (this.viewportHeight * .8).toString() + 'px;');
+        }
+
 
         this.map = L.map('map').setView([59.3953607, 24.6643414], 15);
         L.tileLayer(
@@ -63,6 +70,7 @@ export class HomeIndex {
                 }
             }
         );
+
     }
 
     detached(): void {
