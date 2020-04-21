@@ -1,4 +1,6 @@
 {
   "debug": false,
-  "testing": false
+  "testing": false,
+  "logLevel": "debug", 
+  "backendUrl" : "https://sportmap.akaver.com/api/"
 }
