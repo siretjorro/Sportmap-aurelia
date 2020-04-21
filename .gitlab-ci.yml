@@ -1,0 +1,27 @@
+stages:
+  - build
+  - deploy
+
+# save node_modules from build to deploy
+cache:
+  paths:
+    - node_modules
+
+build:
+  stage: build
+  script:
+    - npm install
+    - au build
+  tags:
+    - default
+
+deploy:
+  stage: deploy
+  script:
+    - /home/com.akaver.sportmap.aurelia/publish-aurelia.sh
+  environment:
+    name: release
+  only:
+    - master
+  tags:
+    - default
