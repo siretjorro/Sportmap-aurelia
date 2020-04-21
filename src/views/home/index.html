@@ -5,7 +5,7 @@
         <select value.bind="selectedGpsSession" class="form-control" id="sessionSelect">
             <option model.bind="null">Choose...</option>
             <option repeat.for="gpsSession of gpsSessions" model.bind="gpsSession">
-                ${gpsSession.userFirstLastName} - ${gpsSession.Name} - Locations: ${gpsSession.gpsLocationsCount} - ${gpsSession.recordedAt}
+                ${gpsSession.userFirstLastName} - ${gpsSession.name} - Locations: ${gpsSession.gpsLocationsCount} - ${gpsSession.recordedAt}
             </option>
 
         </select>
