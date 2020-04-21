@@ -6,4 +6,5 @@ export interface IGpsLocation {
     altitude: number;
     verticalAccuracy: number;
     gpsLocationTypeId: string;
+    recordedAt: string;
 }

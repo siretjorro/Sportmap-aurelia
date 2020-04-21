@@ -7,10 +7,14 @@ import { PLATFORM } from 'aurelia-pal';
 import { autoinject, LogManager, View, observable } from 'aurelia-framework';
 import { RouterConfiguration, Router, RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
+
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
 import * as L from 'leaflet';
 import 'leaflet-defaulticon-compatibility';
+import { distanceBetweenLatLon, getColorCodedPolylines } from 'utils/utils-leaflet';
+import { decimalToHex } from 'utils/utils-general';
+import gradstop from 'gradstop';
 
 export const log = LogManager.getLogger('app.HomeIndex');
 
@@ -35,10 +39,14 @@ export class HomeIndex {
     viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
     viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
+    private paceColorGradient: string[] = [];
+
     constructor(private gpsSessionService: GpsSessionService, private gpsLocationService: GpsLocationService) {
-
-
-
+        this.paceColorGradient = gradstop({
+            stops: 1024,
+            inputFormat: 'hex',
+            colorArray: ['#00FF00', '#FFFF00', '#FF0000']
+        });
     }
 
     // ================================= view lifecycle ===============================
@@ -158,60 +166,57 @@ export class HomeIndex {
         const polylinePoints: L.LatLngExpression[] = [];
         this.trackLength = 0;
 
+        const paceBuckets = getColorCodedPolylines(this.gpsLocations, 6, 18, 1024);
+
         this.gpsLocations.forEach((location, index) => {
             polylinePoints.push([location.latitude, location.longitude]);
 
             if (index > 0) {
-                this.trackLength = this.trackLength + this.distance(
+                this.trackLength = this.trackLength + distanceBetweenLatLon(
                     this.gpsLocations[index - 1].latitude, this.gpsLocations[index - 1].longitude,
                     location.latitude, location.longitude);
             }
 
             if (location.gpsLocationTypeId == GpsLocationTypes.wayPoint && this.showWp) {
-                log.debug('adding wp  to ', [location.latitude, location.longitude])
+                //log.debug('adding wp  to ', [location.latitude, location.longitude])
                 L.marker([location.latitude, location.longitude], { icon: iconWp }).addTo(this.map);
             } else
                 if (location.gpsLocationTypeId == GpsLocationTypes.checkPoint && this.showCp) {
-                    log.debug('adding cp to ', [location.latitude, location.longitude])
+                    //log.debug('adding cp to ', [location.latitude, location.longitude])
                     L.marker([location.latitude, location.longitude], { icon: iconCp }).addTo(this.map);
                 }
 
         });
 
+        paceBuckets.forEach((paceSegment, bucketNo) => {
+            paceSegment.forEach(lineSegment => {
+                const polyline = L.polyline(lineSegment).setStyle({
+                    color: this.paceColorGradient[bucketNo],
+                    weight: 5
+                }).addTo(this.map);
+            })
+        })
+
+
         // add start marker
         if (polylinePoints.length > 0) {
             L.marker([this.gpsLocations[0].latitude, this.gpsLocations[0].longitude], { icon: iconS }).addTo(this.map);
+            this.map.setView([this.gpsLocations[0].latitude, this.gpsLocations[0].longitude], 15);
         }
         // add finish marker
         if (polylinePoints.length > 1) {
             L.marker([this.gpsLocations[this.gpsLocations.length - 1].latitude, this.gpsLocations[this.gpsLocations.length - 1].longitude], { icon: iconF }).addTo(this.map);
         }
 
+        /*
         if (polylinePoints.length > 0) {
             const polyline = L.polyline(polylinePoints).addTo(this.map);
             this.map.fitBounds(polyline.getBounds());
         }
+        */
 
     }
 
-    distance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-        if ((lat1 == lat2) && (lon1 == lon2)) {
-            return 0;
-        }
-        else {
-            const radlat1 = Math.PI * lat1 / 180;
-            const radlat2 = Math.PI * lat2 / 180;
-            const theta = lon1 - lon2;
-            const radtheta = Math.PI * theta / 180;
-            let dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-            if (dist > 1) {
-                dist = 1;
-            }
-            dist = Math.acos(dist);
-            dist = dist * 180 / Math.PI;
-            dist = dist * 60 * 1.853159616;
-            return dist;
-        }
-    }
+
 }
 
