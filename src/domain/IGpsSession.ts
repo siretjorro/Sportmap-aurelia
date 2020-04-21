@@ -3,4 +3,6 @@ export interface IGpsSession {
     name: string;
     description: string;
     recordedAt: string;
+    gpsLocationsCount: number;
+    userFirstLastName: string;
 }
