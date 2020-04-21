@@ -12,7 +12,7 @@ build:
   stage: build
   script:
     - npm install
-    - au build
+    - au build --env prod
   tags:
     - default
 
