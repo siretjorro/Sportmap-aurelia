@@ -8,11 +8,13 @@ import { autoinject, LogManager, View, observable } from 'aurelia-framework';
 import { RouterConfiguration, Router, RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; 
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css';
 import * as L from 'leaflet';
 import 'leaflet-defaulticon-compatibility';
 
 export const log = LogManager.getLogger('app.HomeIndex');
+
+
 
 @autoinject
 export class HomeIndex {
@@ -28,15 +30,14 @@ export class HomeIndex {
 
     constructor(private gpsSessionService: GpsSessionService, private gpsLocationService: GpsLocationService) {
 
+
+
+        
     }
 
     // ================================= view lifecycle ===============================
     created(owningView: View, myView: View): void {
         log.debug("created");
-
-
-
-
     }
 
     bind(bindingContext: Record<string, any>, overrideContext: Record<string, any>): void {
@@ -54,10 +55,6 @@ export class HomeIndex {
             }
         ).addTo(this.map);
 
-
-
-
-        L.marker([59.3172968, 25.6579607]).addTo(this.map);
 
         this.gpsSessionService.getAll().then(
             response => {
@@ -122,17 +119,30 @@ export class HomeIndex {
 
     visualizeSession(): void {
 
+        const iconWp = L.icon({
+            iconUrl: '/marker-icon-wp.png',
+            iconSize:     [25, 41], // size of the icon
+            iconAnchor:   [13, 41], // point of the icon which will correspond to marker's location
+        });
+
+        const iconCp = L.icon({
+            iconUrl: '/marker-icon-wp.png',
+            iconSize:     [25, 41], // size of the icon
+            iconAnchor:   [12, 40], // point of the icon which will correspond to marker's location
+        });
+
+
         const polylinePoints: L.LatLngExpression[] = [];
         this.gpsLocations.forEach(location => {
             polylinePoints.push([location.latitude, location.longitude]);
 
             if (location.gpsLocationTypeId == GpsLocationTypes.wayPoint) {
                 log.debug('adding wp  to ', [location.latitude, location.longitude])
-                L.marker([location.latitude, location.longitude]).addTo(this.map);
+                L.marker([location.latitude, location.longitude], {icon: iconWp}).addTo(this.map);
             } else
                 if (location.gpsLocationTypeId == GpsLocationTypes.checkPoint) {
                     log.debug('adding cp to ', [location.latitude, location.longitude])
-                    L.marker([location.latitude, location.longitude]).addTo(this.map);
+                    L.marker([location.latitude, location.longitude], {icon: iconCp}).addTo(this.map);
                 }
 
         });
