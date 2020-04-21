@@ -1,3 +1,4 @@
+import { GpsLocationTypes } from './../../domain/GpsLocationTypes';
 import { IGpsLocation } from './../../domain/IGpsLocation';
 import { GpsLocationService } from './../../services/gpslocation-service';
 import { GpsSessionService } from './../../services/gpssession-service';
@@ -6,15 +7,10 @@ import { PLATFORM } from 'aurelia-pal';
 import { autoinject, LogManager, View, observable } from 'aurelia-framework';
 import { RouterConfiguration, Router, RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
-import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-    iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-    iconUrl: require('leaflet/dist/images/marker-icon.png'),
-    shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
-});
+import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; 
+import * as L from 'leaflet';
+import 'leaflet-defaulticon-compatibility';
 
 export const log = LogManager.getLogger('app.HomeIndex');
 
@@ -38,6 +34,9 @@ export class HomeIndex {
     created(owningView: View, myView: View): void {
         log.debug("created");
 
+
+
+
     }
 
     bind(bindingContext: Record<string, any>, overrideContext: Record<string, any>): void {
@@ -55,6 +54,10 @@ export class HomeIndex {
             }
         ).addTo(this.map);
 
+
+
+
+        L.marker([59.3172968, 25.6579607]).addTo(this.map);
 
         this.gpsSessionService.getAll().then(
             response => {
@@ -118,13 +121,27 @@ export class HomeIndex {
     }
 
     visualizeSession(): void {
+
         const polylinePoints: L.LatLngExpression[] = [];
         this.gpsLocations.forEach(location => {
             polylinePoints.push([location.latitude, location.longitude]);
+
+            if (location.gpsLocationTypeId == GpsLocationTypes.wayPoint) {
+                log.debug('adding wp  to ', [location.latitude, location.longitude])
+                L.marker([location.latitude, location.longitude]).addTo(this.map);
+            } else
+                if (location.gpsLocationTypeId == GpsLocationTypes.checkPoint) {
+                    log.debug('adding cp to ', [location.latitude, location.longitude])
+                    L.marker([location.latitude, location.longitude]).addTo(this.map);
+                }
+
         });
 
-        const polyline = L.polyline(polylinePoints).addTo(this.map);
-        this.map.fitBounds(polyline.getBounds());
+        if (polylinePoints.length > 0) {
+            const polyline = L.polyline(polylinePoints).addTo(this.map);
+            this.map.fitBounds(polyline.getBounds());
+        }
+
     }
 }
 
