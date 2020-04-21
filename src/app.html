@@ -13,6 +13,10 @@
                     <li repeat.for="nav of router.navigation" class="nav-item ${nav.isActive ? 'active' : ''}">
                         <a class="nav-link" href.bind="nav.href">${nav.title}</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href.bind="swaggerUrl">SwaggerDocs</a>
+                    </li>
+                    
 <!--
                     <li class="nav-item active">
                         <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>

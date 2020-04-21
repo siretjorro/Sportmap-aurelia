@@ -2,7 +2,7 @@ import { PLATFORM } from 'aurelia-pal';
 import { autoinject, LogManager, View } from 'aurelia-framework';
 import { RouterConfiguration, Router, RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
-
+import * as environment from '../config/environment.json';
 
 export const log = LogManager.getLogger('app.App');
 
@@ -10,8 +10,8 @@ export const log = LogManager.getLogger('app.App');
 export class App {
     router?: Router;
     private subscriptions: Subscription[] = [];
+    private swaggerUrl = environment.swaggerUrl;
 
-    map?: L.Map;
 
     // ================================= view lifecycle ===============================
     created(owningView: View, myView: View): void {
