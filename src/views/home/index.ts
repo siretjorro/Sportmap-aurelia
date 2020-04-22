@@ -43,9 +43,9 @@ export class HomeIndex {
 
     constructor(private gpsSessionService: GpsSessionService, private gpsLocationService: GpsLocationService) {
         this.paceColorGradient = gradstop({
-            stops: 1024,
+            stops: 256,
             inputFormat: 'hex',
-            colorArray: ['#00FF00', '#FFFF00', '#FF0000']
+            colorArray: ['#00FF00', '#FFFF00', '#FF0000'] 
         });
     }
 
@@ -166,7 +166,7 @@ export class HomeIndex {
         const polylinePoints: L.LatLngExpression[] = [];
         this.trackLength = 0;
 
-        const paceBuckets = getColorCodedPolylines(this.gpsLocations, 6, 18, 1024);
+        const paceBuckets = getColorCodedPolylines(this.gpsLocations, 6, 18, this.paceColorGradient.length);
 
         this.gpsLocations.forEach((location, index) => {
             polylinePoints.push([location.latitude, location.longitude]);

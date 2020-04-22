@@ -35,7 +35,7 @@ function addToBucket(buckets: L.LatLngExpression[][][], bucketNo: number, latLon
     return buckets;
 }
 // minSpeed and maxSpeed - seconds per km
-export function getColorCodedPolylines(locations: IGpsLocation[], minPace: number = 6, maxPace: number = 10, paceBuckets: number = 256): L.LatLngExpression[][][] {
+export function getColorCodedPolylines(locations: IGpsLocation[], minPace: number = 6, maxPace: number = 18, paceBuckets: number = 256): L.LatLngExpression[][][] {
     if (!locations || locations.length == 0) return [];
 
     const result: L.LatLngExpression[][][] = [];

@@ -45,3 +45,8 @@ export function decimalToHex(d: number, padding? : number | null): string {
 
     return hex;
 }
+
+export function roundToPrecision(x: number, precision?: number): number {
+    const y = +x + (precision === undefined ? 0.5 : precision/2);
+    return y - (y % (precision === undefined ? 1 : +precision));
+}
