@@ -67,8 +67,8 @@ export class HomeIndex {
         }
 
 
-        //this.map = L.map('map').setView([59.3953607, 24.6643414], 15);
-        this.map = L.map('map').setView([59.3245441,25.6506961], 14);
+        this.map = L.map('map').setView([59.3953607, 24.6643414], 18);
+        //this.map = L.map('map').setView([59.3245441,25.6506961], 14);
         
         L.tileLayer(
             'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -91,13 +91,16 @@ export class HomeIndex {
         //longitude: 25.6569272
 
 /*
+        // use this? https://github.com/IvanSanchez/Leaflet.ImageOverlay.Rotated/blob/gh-pages/Leaflet.ImageOverlay.Rotated.js
+
         const topLat= 59.337;
         const topLng = 25.645;
         const width = 0.035;
         const height = 0.025;
         const imageBounds: L.LatLngBoundsExpression = [
             [topLat, topLng], 
-            [topLat - height, topLng + width]];
+            [topLat - height, topLng + width]
+        ];
 
         L.imageOverlay(imageUrl, imageBounds).addTo(this.map);
         L.imageOverlay(imageUrl, imageBounds).bringToFront();
