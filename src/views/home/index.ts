@@ -67,7 +67,9 @@ export class HomeIndex {
         }
 
 
-        this.map = L.map('map').setView([59.3953607, 24.6643414], 15);
+        //this.map = L.map('map').setView([59.3953607, 24.6643414], 15);
+        this.map = L.map('map').setView([59.3245441,25.6506961], 14);
+        
         L.tileLayer(
             'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             {
@@ -75,6 +77,31 @@ export class HomeIndex {
             }
         ).addTo(this.map);
 
+
+
+        const imageUrl = '/apuparra.png';
+
+
+        // start
+        // latitude: 59.3245441
+        //longitude: 25.6506961
+
+        // finish
+        //latitude: 59.3176531
+        //longitude: 25.6569272
+
+/*
+        const topLat= 59.337;
+        const topLng = 25.645;
+        const width = 0.035;
+        const height = 0.025;
+        const imageBounds: L.LatLngBoundsExpression = [
+            [topLat, topLng], 
+            [topLat - height, topLng + width]];
+
+        L.imageOverlay(imageUrl, imageBounds).addTo(this.map);
+        L.imageOverlay(imageUrl, imageBounds).bringToFront();
+*/
 
         this.gpsSessionService.getAll().then(
             response => {
@@ -166,7 +193,10 @@ export class HomeIndex {
         const polylinePoints: L.LatLngExpression[] = [];
         this.trackLength = 0;
 
-        const paceBuckets = getColorCodedPolylines(this.gpsLocations, 6, 18, this.paceColorGradient.length);
+        const minPace = this.selectedGpsSession?.paceMin ? this.selectedGpsSession?.paceMin : 6*60;
+        const maxPace = this.selectedGpsSession?.paceMax ? this.selectedGpsSession?.paceMax : 18*60;
+        
+        const paceBuckets = getColorCodedPolylines(this.gpsLocations, minPace, maxPace, this.paceColorGradient.length);
 
         this.gpsLocations.forEach((location, index) => {
             polylinePoints.push([location.latitude, location.longitude]);
