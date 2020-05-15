@@ -1,17 +1,55 @@
+import { ICulture } from './domain/ICulture';
+import { CultureService } from './services/culture-service';
 import { PLATFORM } from 'aurelia-pal';
 import { autoinject, LogManager, View } from 'aurelia-framework';
 import { RouterConfiguration, Router, RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 import * as environment from '../config/environment.json';
-
+import { HttpClient } from 'aurelia-fetch-client';
+import { Store, connectTo } from "aurelia-store";
+import { IState } from 'state/state';
+import { LayoutResources } from 'lang/LayoutResources';
 export const log = LogManager.getLogger('app.App');
 
+@connectTo()
 @autoinject
 export class App {
     router?: Router;
     private subscriptions: Subscription[] = [];
     private swaggerUrl = environment.swaggerUrl;
 
+    public state!: IState;
+
+    private langResources = LayoutResources;
+
+    constructor(private store: Store<IState>, private cultureService: CultureService, private httpClient: HttpClient) {
+        this.httpClient.configure(config => {
+            config
+                .withBaseUrl(environment.backendUrl)
+                .withDefaults({
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'Fetch'
+                    }
+                })
+                .withInterceptor({
+                    request(request) {
+                        console.log(`Requesting ${request.method} ${request.url}`);
+                        return request;
+                    },
+                    response(response) {
+                        console.log(`Received ${response.status} ${response.url}`);
+                        return response;
+                    }
+                });
+        });
+
+        this.store.registerAction('stateUpdateCultures', this.stateUpdateCultures);
+        this.store.registerAction('stateUpdateSelectedCulture', this.stateUpdateSelectedCulture);
+
+    }
 
     // ================================= view lifecycle ===============================
     created(owningView: View, myView: View): void {
@@ -23,8 +61,19 @@ export class App {
         log.debug("bind");
     }
 
-    attached(): void {
+    async attached(): Promise<void> {
         log.debug("attached");
+
+        // get the languages from backend
+        const result = await this.cultureService.getAll();
+        if (result.statusCode >= 200 && result.statusCode < 300) {
+            log.debug('data', result.data);
+            if (result.data) {
+                this.store.dispatch(this.stateUpdateCultures, result.data);
+            }
+        }
+
+
     }
 
     detached(): void {
@@ -68,10 +117,27 @@ export class App {
 
     // ================================= View  ===============================
 
+    setCulture(culture: ICulture): void {
+        this.store.dispatch(this.stateUpdateSelectedCulture, culture);
+    }
+
     // ================================= Event  ===============================
 
     // ================================= Helpers  ===============================
 
 
+    // ================================= State  ===============================
 
+    // take the old state, make shallow copy, update copy, return as new state
+    stateUpdateCultures(state: IState, cultures: ICulture[]): IState {
+        const newState = Object.assign({}, state);
+        newState.cultures = cultures;
+        return newState;
+    }
+
+    stateUpdateSelectedCulture(state: IState, culture: ICulture): IState {
+        const newState = Object.assign({}, state);
+        newState.selectedCulture = culture;
+        return newState;
+    }
 }

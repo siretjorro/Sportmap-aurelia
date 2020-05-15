@@ -1,6 +1,6 @@
 <template>
     <div class="form-group">
-        <label for="sessionSelect">Sessions</label>
+        <label for="sessionSelect">${langResources[state.selectedCulture.code].sessions}</label>
         <select value.bind="selectedGpsSession" class="form-control" id="sessionSelect">
             <option model.bind="null">Choose...</option>
             <option repeat.for="gpsSession of gpsSessions" model.bind="gpsSession">

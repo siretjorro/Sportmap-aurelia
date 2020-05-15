@@ -1,3 +1,4 @@
+import { IndexResources } from './../../lang/IndexResources';
 import { GpsLocationTypes } from './../../domain/GpsLocationTypes';
 import { IGpsLocation } from './../../domain/IGpsLocation';
 import { GpsLocationService } from './../../services/gpslocation-service';
@@ -15,15 +16,19 @@ import 'leaflet-defaulticon-compatibility';
 import { distanceBetweenLatLon, getColorCodedPolylines } from 'utils/utils-leaflet';
 import { decimalToHex } from 'utils/utils-general';
 import gradstop from 'gradstop';
+import { Store, connectTo } from "aurelia-store";
+import { IState } from 'state/state';
+
 
 export const log = LogManager.getLogger('app.HomeIndex');
 
 
-
+@connectTo()
 @autoinject
 export class HomeIndex {
     private subscriptions: Subscription[] = [];
-
+    public state!: IState;
+    
     map!: L.Map;
 
     gpsSessions: IGpsSession[] = [];
@@ -40,6 +45,9 @@ export class HomeIndex {
     viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
     private paceColorGradient: string[] = [];
+
+    private langResources = IndexResources;
+
 
     constructor(private gpsSessionService: GpsSessionService, private gpsLocationService: GpsLocationService) {
         this.paceColorGradient = gradstop({

@@ -12,31 +12,6 @@ export class BaseService<TEntity> {
     }
 
     constructor(protected apiEndpointUrl: string, protected httpClient: HttpClient) {
-        this.httpClient.configure(config => {
-            config
-                .withBaseUrl(environment.backendUrl)
-                .withDefaults({
-                    credentials: 'same-origin',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'Fetch'
-                    }
-                })
-                .withInterceptor({
-                    request(request) {
-                        console.log(`Requesting ${request.method} ${request.url}`);
-                        return request;
-                    },
-                    response(response) {
-                        console.log(`Received ${response.status} ${response.url}`);
-                        return response;
-                    }
-                });
-        });
-
-
-
     }
 
     async getAll(): Promise<IFetchResponse<TEntity[]>> {
