@@ -28,7 +28,7 @@ export const log = LogManager.getLogger('app.HomeIndex');
 export class HomeIndex {
     private subscriptions: Subscription[] = [];
     public state!: IState;
-    
+
     map!: L.Map;
 
     gpsSessions: IGpsSession[] = [];
@@ -38,6 +38,10 @@ export class HomeIndex {
     selectedGpsSession: IGpsSession | null = null;
     showCp = true;
     showWp = true;
+    minLocations = 10;
+    minDistance = 10;
+    minDuration = 60;
+
 
     trackLength = 0;
 
@@ -53,7 +57,7 @@ export class HomeIndex {
         this.paceColorGradient = gradstop({
             stops: 256,
             inputFormat: 'hex',
-            colorArray: ['#00FF00', '#FFFF00', '#FF0000'] 
+            colorArray: ['#00FF00', '#FFFF00', '#FF0000']
         });
     }
 
@@ -77,7 +81,7 @@ export class HomeIndex {
 
         this.map = L.map('map').setView([59.3953607, 24.6643414], 18);
         //this.map = L.map('map').setView([59.3245441,25.6506961], 14);
-        
+
         L.tileLayer(
             'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
             {
@@ -98,23 +102,23 @@ export class HomeIndex {
         //latitude: 59.3176531
         //longitude: 25.6569272
 
-/*
-        // use this? https://github.com/IvanSanchez/Leaflet.ImageOverlay.Rotated/blob/gh-pages/Leaflet.ImageOverlay.Rotated.js
+        /*
+                // use this? https://github.com/IvanSanchez/Leaflet.ImageOverlay.Rotated/blob/gh-pages/Leaflet.ImageOverlay.Rotated.js
+        
+                const topLat= 59.337;
+                const topLng = 25.645;
+                const width = 0.035;
+                const height = 0.025;
+                const imageBounds: L.LatLngBoundsExpression = [
+                    [topLat, topLng], 
+                    [topLat - height, topLng + width]
+                ];
+        
+                L.imageOverlay(imageUrl, imageBounds).addTo(this.map);
+                L.imageOverlay(imageUrl, imageBounds).bringToFront();
+        */
 
-        const topLat= 59.337;
-        const topLng = 25.645;
-        const width = 0.035;
-        const height = 0.025;
-        const imageBounds: L.LatLngBoundsExpression = [
-            [topLat, topLng], 
-            [topLat - height, topLng + width]
-        ];
-
-        L.imageOverlay(imageUrl, imageBounds).addTo(this.map);
-        L.imageOverlay(imageUrl, imageBounds).bringToFront();
-*/
-
-        this.gpsSessionService.getAll().then(
+        this.gpsSessionService.getAllSessions(this.minLocations, this.minDistance, this.minDuration).then(
             response => {
                 if (response.data) {
                     this.gpsSessions = response.data;
@@ -156,6 +160,15 @@ export class HomeIndex {
 
 
     // ================================= View  ===============================
+    reloadSessions(): void {
+        this.gpsSessionService.getAllSessions(this.minLocations, this.minDistance, this.minDuration).then(
+            response => {
+                if (response.data) {
+                    this.gpsSessions = response.data;
+                }
+            }
+        );
+    }
 
     // ================================= Event  ===============================
 
@@ -204,9 +217,9 @@ export class HomeIndex {
         const polylinePoints: L.LatLngExpression[] = [];
         this.trackLength = 0;
 
-        const minPace = this.selectedGpsSession?.paceMin ? this.selectedGpsSession?.paceMin : 6*60;
-        const maxPace = this.selectedGpsSession?.paceMax ? this.selectedGpsSession?.paceMax : 18*60;
-        
+        const minPace = this.selectedGpsSession?.paceMin ? this.selectedGpsSession?.paceMin : 6 * 60;
+        const maxPace = this.selectedGpsSession?.paceMax ? this.selectedGpsSession?.paceMax : 18 * 60;
+
         const paceBuckets = getColorCodedPolylines(this.gpsLocations, minPace, maxPace, this.paceColorGradient.length);
 
         this.gpsLocations.forEach((location, index) => {
