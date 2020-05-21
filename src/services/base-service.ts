@@ -2,6 +2,8 @@ import { autoinject } from 'aurelia-framework';
 import { HttpClient, json } from 'aurelia-fetch-client';
 import * as environment from '../../config/environment.json';
 import { IFetchResponse } from 'types/IFetchResponse';
+import { IQueryParams } from 'types/IQueryParams';
+import { stringify } from 'querystring';
 
 @autoinject
 export class BaseService<TEntity> {
@@ -14,10 +16,21 @@ export class BaseService<TEntity> {
     constructor(protected apiEndpointUrl: string, protected httpClient: HttpClient) {
     }
 
-    async getAll(): Promise<IFetchResponse<TEntity[]>> {
+    async getAll(queryParams?: IQueryParams ): Promise<IFetchResponse<TEntity[]>> {
+        let url = this.apiEndpointUrl;
+        if (queryParams !== undefined){
+            const params = [] as string[];
+            Object.keys(queryParams).forEach(key => {
+                params.push(key + '=' + queryParams[key]);
+            })
+    
+            if (params.length > 0){
+                url = url + '?' + params.join('&');
+            }
+        }
         try {
             const response = await this.httpClient
-                .fetch(this.apiEndpointUrl, {
+                .fetch(url, {
                     cache: "no-store",
                     headers:this.authHeaders
                 });

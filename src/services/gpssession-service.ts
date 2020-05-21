@@ -12,7 +12,7 @@ export class GpsSessionService extends BaseService<IGpsSession> {
     }
 
 
-
+/*
     async getAllSessions(minLocations: number, minDistance: number, minDuration: number): Promise<IFetchResponse<IGpsSession[]>> {
         let url = this.apiEndpointUrl;
         url = url + '?minLocationsCount=' + minLocations.toString() + '&minDuration=' + minDuration.toString() + '&minDistance=' + minDistance.toString();
@@ -44,5 +44,5 @@ export class GpsSessionService extends BaseService<IGpsSession> {
             }
         }
     }
-
+*/
 }

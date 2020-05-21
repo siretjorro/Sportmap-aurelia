@@ -118,7 +118,7 @@ export class HomeIndex {
                 L.imageOverlay(imageUrl, imageBounds).bringToFront();
         */
 
-        this.gpsSessionService.getAllSessions(this.minLocations, this.minDistance, this.minDuration).then(
+        this.gpsSessionService.getAll({minLocationsCount: this.minLocations, minDistance: this.minDistance, minDuration: this.minDuration}).then(
             response => {
                 if (response.data) {
                     this.gpsSessions = response.data;
@@ -161,7 +161,7 @@ export class HomeIndex {
 
     // ================================= View  ===============================
     reloadSessions(): void {
-        this.gpsSessionService.getAllSessions(this.minLocations, this.minDistance, this.minDuration).then(
+        this.gpsSessionService.getAll({minLocationsCount: this.minLocations, minDistance: this.minDistance, minDuration: this.minDuration}).then(
             response => {
                 if (response.data) {
                     this.gpsSessions = response.data;
