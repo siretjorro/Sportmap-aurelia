@@ -21,7 +21,7 @@ export class CultureService extends BaseService<ICulture> {
             // happy case
             if (response.ok) {
                 const data = (await response.json()) as ICulture[];
-                console.log(data);
+                // console.log(data);
                 return {
                     statusCode: response.status,
                     data: data

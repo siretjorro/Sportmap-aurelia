@@ -189,7 +189,24 @@ export class HomeIndex {
         }
     }
 
+    clearMap(): void {
+        for (const i in (this.map as any)._layers) {
+            // clear paths and icons
+            if((this.map as any)._layers[i]._path != undefined || (this.map as any)._layers[i]._icon != undefined) {
+                try {
+                    this.map.removeLayer((this.map as any)._layers[i]);
+                }
+                catch(e) {
+                    log.error("problem with " + e + (this.map as any)._layers[i]);
+                }
+            } else {
+                log.debug((this.map as any)._layers[i]);
+            }
+        }
+    }
+
     visualizeSession(): void {
+        this.clearMap();
 
         const iconWp = L.icon({
             iconUrl: '/marker-icon-wp.png',

@@ -75,7 +75,7 @@ export function getColorCodedPolylines(locations: IGpsLocation[], minPace: numbe
 
     }
 
-    console.log(result);
+    //console.log(result);
 
     return result;
 }

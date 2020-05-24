@@ -22,7 +22,7 @@ export class GpsLocationService extends BaseService<IGpsLocation> {
             // happy case
             if (response.ok) {
                 const data = (await response.json()) as IGpsLocation[];
-                console.log(data);
+                // console.log(data);
                 return {
                     statusCode: response.status,
                     data: data
