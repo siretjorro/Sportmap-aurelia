@@ -9,6 +9,7 @@ import { HttpClient } from 'aurelia-fetch-client';
 import { Store, connectTo } from "aurelia-store";
 import { IState } from 'state/state';
 import { LayoutResources } from 'lang/LayoutResources';
+import { pluck } from 'rxjs/operators';
 export const log = LogManager.getLogger('app.App');
 
 @connectTo()
@@ -31,7 +32,8 @@ export class App {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-Requested-With': 'Fetch'
+                        'X-Requested-With': 'Fetch',
+                        'Authorization': 'Bearer ' + this.store.state.pipe(pluck('jwt'))
                     }
                 })
                 .withInterceptor({
@@ -48,7 +50,7 @@ export class App {
 
         this.store.registerAction('stateUpdateCultures', this.stateUpdateCultures);
         this.store.registerAction('stateUpdateSelectedCulture', this.stateUpdateSelectedCulture);
-
+        this.store.registerAction('stateRemoveJwt', this.stateRemoveJwt);
     }
 
     // ================================= view lifecycle ===============================
@@ -110,6 +112,9 @@ export class App {
         config.title = 'SportMap';
         config.map([
             { route: ['', 'home'], name: 'home', moduleId: PLATFORM.moduleName('views/home/index'), nav: true, title: 'Home' },
+            { route: 'tracks', name: 'tracks', moduleId: PLATFORM.moduleName('views/tracks/index'), nav: true, title: 'Tracks' },
+            { route: 'account/login', name: 'account-login', moduleId: PLATFORM.moduleName('views/account/login'), nav: false, title: 'Login' },
+            { route: 'account/register', name: 'account-register', moduleId: PLATFORM.moduleName('views/account/register'), nav: false, title: 'Register' },
         ]);
 
         config.mapUnknownRoutes('views/home/index');
@@ -119,6 +124,14 @@ export class App {
 
     setCulture(culture: ICulture): void {
         this.store.dispatch(this.stateUpdateSelectedCulture, culture);
+    }
+
+    logoutOnClick(): void {
+        this.store.dispatch(this.stateRemoveJwt);
+
+        if (this.router) {
+            this.router.navigateToRoute('account-login');
+        }
     }
 
     // ================================= Event  ===============================
@@ -138,6 +151,12 @@ export class App {
     stateUpdateSelectedCulture(state: IState, culture: ICulture): IState {
         const newState = Object.assign({}, state);
         newState.selectedCulture = culture;
+        return newState;
+    }
+
+    stateRemoveJwt(state: IState): IState {
+        const newState = Object.assign({}, state);
+        newState.jwt = undefined;
         return newState;
     }
 }
