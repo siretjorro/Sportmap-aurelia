@@ -1,3 +1,33 @@
 <template>
-    register
+    <h1>Register</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <section>
+                <form id="account" method="post" submit.trigger="onSubmit($event)">
+                    <h4>Register a new account</h4>
+                    <!-- <h4 if.bind="_errorMessage != null" style="color:red;">${_errorMessage}</h4> -->
+                    <hr />
+                    <div class="form-group">
+                        <label for="Input_Email">Email</label>
+                        <input class="form-control" type="email" value.bind="_email" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Input_Password">Password</label>
+                        <input class="form-control" type="password" value.bind="_password" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Input_Password">First name</label>
+                        <input class="form-control" type="password" value.bind="_firstName" />
+                    </div>
+                    <div class="form-group">
+                        <label for="Input_Password">Last name</label>
+                        <input class="form-control" type="password" value.bind="_lastName" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Register</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
 </template>

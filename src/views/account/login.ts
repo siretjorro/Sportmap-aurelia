@@ -1,6 +1,6 @@
 import { autoinject } from 'aurelia-framework';
 import { Router } from 'aurelia-router';
-import { AccountService } from 'services/account-service';
+import { LoginService } from 'services/login-service';
 import { IState } from 'state/state';
 import { Store } from 'aurelia-store';
 
@@ -8,16 +8,16 @@ import { Store } from 'aurelia-store';
 export class AccountLogin {
     private _email: string = "";
     private _password: string = "";
-    private _errorMessage: string | null = null;
+    // private _errorMessage: string | null = null;
 
-    constructor(private store: Store<IState>, private accountService: AccountService, private router: Router) {
+    constructor(private store: Store<IState>, private loginService: LoginService, private router: Router) {
         this.store.registerAction('stateUpdateJwt', this.stateUpdateJwt);
     }
 
     // ================================= View  ===============================
 
     onSubmit(event: Event): void {
-        this.accountService.post({ email: this._email, password: this._password }).then(
+    this.loginService.post({ email: this._email, password: this._password }).then(
             response => {
                 if (response.data) {
                     this.store.dispatch(this.stateUpdateJwt, response.data.token);
