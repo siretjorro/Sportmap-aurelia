@@ -35,8 +35,11 @@ export class App {
                     }
                 })
                 .withInterceptor({
-                    request(request) {
-                        console.log(`Requesting ${request.method} ${request.url}`);
+                    request: (request): Request => {
+                        console.log(`Requesting ${request.method} ${request.url}`, this.state);
+                        if (this.state && this.state.jwt){
+                            request.headers.append('Authorization','Bearer ' + this.state.jwt);
+                        }
                         return request;
                     },
                     response(response) {
