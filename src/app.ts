@@ -1,7 +1,7 @@
 import { ICulture } from './domain/ICulture';
 import { CultureService } from './services/culture-service';
 import { PLATFORM } from 'aurelia-pal';
-import { autoinject, LogManager, View } from 'aurelia-framework';
+import { autoinject, LogManager, View, observable } from 'aurelia-framework';
 import { RouterConfiguration, Router, RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 import * as environment from '../config/environment.json';
@@ -9,7 +9,6 @@ import { HttpClient } from 'aurelia-fetch-client';
 import { Store, connectTo } from "aurelia-store";
 import { IState } from 'state/state';
 import { LayoutResources } from 'lang/LayoutResources';
-import { pluck } from 'rxjs/operators';
 export const log = LogManager.getLogger('app.App');
 
 @connectTo()
@@ -32,8 +31,7 @@ export class App {
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
-                        'X-Requested-With': 'Fetch',
-                        'Authorization': 'Bearer ' + this.store.state.pipe(pluck('jwt'))
+                        'X-Requested-With': 'Fetch'
                     }
                 })
                 .withInterceptor({
@@ -47,7 +45,6 @@ export class App {
                     }
                 });
         });
-
         this.store.registerAction('stateUpdateCultures', this.stateUpdateCultures);
         this.store.registerAction('stateUpdateSelectedCulture', this.stateUpdateSelectedCulture);
         this.store.registerAction('stateRemoveJwt', this.stateRemoveJwt);
@@ -74,8 +71,6 @@ export class App {
                 this.store.dispatch(this.stateUpdateCultures, result.data);
             }
         }
-
-
     }
 
     detached(): void {

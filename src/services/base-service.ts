@@ -1,10 +1,12 @@
-import { autoinject } from 'aurelia-framework';
+import { autoinject, observable } from 'aurelia-framework';
 import { HttpClient, json } from 'aurelia-fetch-client';
 import * as environment from '../../config/environment.json';
 import { IFetchResponse } from 'types/IFetchResponse';
 import { IQueryParams } from 'types/IQueryParams';
 import { stringify } from 'querystring';
 import { ILoginResponse } from 'domain/ILoginResponse';
+import { Store } from 'aurelia-store';
+import { IState } from 'state/state';
 
 @autoinject
 export class BaseService<TEntity> {
@@ -62,7 +64,7 @@ export class BaseService<TEntity> {
             const response = await this.httpClient
                 .fetch(this.apiEndpointUrl + '/' + id, {
                     cache: "no-store",
-                    // headers: this.authHeaders
+                    headers: this.authHeaders
                 });
             // happy case
             if (response.ok) {
