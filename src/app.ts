@@ -37,8 +37,8 @@ export class App {
                 .withInterceptor({
                     request: (request): Request => {
                         console.log(`Requesting ${request.method} ${request.url}`, this.state);
-                        if (this.state && this.state.jwt){
-                            request.headers.append('Authorization','Bearer ' + this.state.jwt);
+                        if (this.state && this.state.jwt) {
+                            request.headers.append('Authorization', 'Bearer ' + this.state.jwt);
                         }
                         return request;
                     },
@@ -109,8 +109,10 @@ export class App {
         this.router = router;
         config.title = 'SportMap';
         config.map([
-            { route: ['', 'home'], name: 'home', moduleId: PLATFORM.moduleName('views/home/index'), nav: true, title: 'Home' },
-            { route: 'tracks', name: 'tracks', moduleId: PLATFORM.moduleName('views/tracks/index'), nav: true, title: 'Tracks' },
+            { route: ['', 'home'], name: 'home', moduleId: PLATFORM.moduleName('views/home/index'), nav: false, title: 'Home' },
+            { route: 'tracks', name: 'tracks-index', moduleId: PLATFORM.moduleName('views/tracks/index'), nav: true, title: 'Tracks' },
+            { route: 'tracks/create', name: 'tracks-create', moduleId: PLATFORM.moduleName('views/tracks/create'), nav: false, title: 'Tracks Create' },
+            { route: 'track/details/:id?', name: 'track-details', moduleId: PLATFORM.moduleName('views/tracks/details'), nav: false, title: 'Track Details' },
             { route: 'account/login', name: 'account-login', moduleId: PLATFORM.moduleName('views/account/login'), nav: false, title: 'Login' },
             { route: 'account/register', name: 'account-register', moduleId: PLATFORM.moduleName('views/account/register'), nav: false, title: 'Register' },
         ]);

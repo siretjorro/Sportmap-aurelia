@@ -1,3 +1,30 @@
 <template>
-    <p repeat.for="friend of tracks">Hello, ${friend.name}!</p>
+    <div class="row">
+        <div class="col">
+          <h1>Tracks</h1>
+        </div>
+        <div class="col">
+          <div class="float-right">
+            <a route-href="route: tracks-create" class="btn btn-secondary">Add new</a>
+          </div>
+        </div>
+      </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr repeat.for="track of tracks">
+                <th scope="row">${track.id}</th>
+                <td>${track.name}</td>
+                <td>${track.description}</td>
+                <td><a route-href="route: track-details; params.bind: { id: track.id }">Details</a></td>
+            </tr>
+        </tbody>
+    </table>
 </template>

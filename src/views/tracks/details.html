@@ -1,0 +1,27 @@
+<template>
+    <form id="trackpoint" method="post" submit.trigger="onSubmit($event)">
+        <h4>Add a new trackpoint</h4>
+        <!-- <h4 if.bind="_errorMessage != null" style="color:red;">${_errorMessage}</h4> -->
+        <hr />
+        <div class="form-group">
+            <label for="Input_Latitude">Latitude</label>
+            <input class="form-control" type="text" value.bind="_latitude" />
+        </div>
+        <div class="form-group">
+            <label for="Input_Longitude">Longitude</label>
+            <input class="form-control" type="text" value.bind="_longitude" />
+        </div>
+        <div class="form-group">
+            <label for="Input_Longitude">Accuracy</label>
+            <input class="form-control" type="text" value.bind="_accuracy" />
+        </div>
+        <div class="form-group">
+            <label for="Input_Longitude">Pass order</label>
+            <input class="form-control" type="text" value.bind="_passOrder" />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+    </form>
+    <div id="map"></div>
+</template>

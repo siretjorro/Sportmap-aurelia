@@ -1,3 +1,4 @@
+import { ITrackPoint } from './../domain/ITrackPoint';
 import { IGpsLocation } from 'domain/IGpsLocation';
 import { log } from 'app';
 
@@ -35,6 +36,51 @@ function addToBucket(buckets: L.LatLngExpression[][][], bucketNo: number, latLon
     return buckets;
 }
 // minSpeed and maxSpeed - seconds per km
+export function getColorCodedPolylines2(locations: ITrackPoint[], minPace: number = 6*60, maxPace: number = 18*60, paceBuckets: number = 256): L.LatLngExpression[][][] {
+    if (!locations || locations.length == 0) return [];
+
+    const result: L.LatLngExpression[][][] = [];
+    for (let index = 0; index < paceBuckets; index++) {
+        result.push([]);
+    }
+
+    const paceRange = maxPace - minPace;
+    const paceStep = paceRange / paceBuckets;
+
+
+    let prevLocation: ITrackPoint | null = null;
+
+    for (let index = 0; index < locations.length; index++) {
+        const location = locations[index];
+
+        if (prevLocation) {
+            const distance = distanceBetweenLatLon(location.latitude, location.longitude, prevLocation.latitude, prevLocation.longitude);
+            const duration = 1;
+            // skip bad locations
+            if (distance < 1) continue;
+
+            // calculate the speed in minutes per km
+            const paceSecondsPerKm = duration / distance ;
+            let bucketNo = Math.round(((paceSecondsPerKm - minPace) / paceStep));
+            if (bucketNo < 0) {
+                bucketNo = 0
+            } else if (bucketNo >= paceBuckets){
+                bucketNo = paceBuckets - 1;
+            }
+            //console.log(paceSecondsPerKm, bucketNo);
+            addToBucket(result, bucketNo, [location.latitude, location.longitude], [prevLocation.latitude, prevLocation.longitude]);
+
+            //log.debug('distance duration pace', distance, duration, paceMinutesPerKm);
+        }
+        prevLocation = location;
+
+    }
+
+    //console.log(result);
+
+    return result;
+}
+
 export function getColorCodedPolylines(locations: IGpsLocation[], minPace: number = 6*60, maxPace: number = 18*60, paceBuckets: number = 256): L.LatLngExpression[][][] {
     if (!locations || locations.length == 0) return [];
 
@@ -79,4 +125,5 @@ export function getColorCodedPolylines(locations: IGpsLocation[], minPace: numbe
 
     return result;
 }
+
 
