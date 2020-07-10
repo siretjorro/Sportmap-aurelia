@@ -6,7 +6,7 @@ import { RouterConfiguration, Router, RouteConfig, NavigationInstruction } from 
 import { EventAggregator, Subscription } from 'aurelia-event-aggregator';
 import * as environment from '../config/environment.json';
 import { HttpClient } from 'aurelia-fetch-client';
-import { Store, connectTo } from "aurelia-store";
+import { Store, connectTo, MiddlewarePlacement, rehydrateFromLocalStorage, localStorageMiddleware } from "aurelia-store";
 import { IState } from 'state/state';
 import { LayoutResources } from 'lang/LayoutResources';
 export const log = LogManager.getLogger('app.App');
@@ -48,9 +48,15 @@ export class App {
                     }
                 });
         });
+
+        this.store.registerMiddleware(localStorageMiddleware, MiddlewarePlacement.After);
+        this.store.registerAction("REHYDRATE_STATE", rehydrateFromLocalStorage);
+
         this.store.registerAction('stateUpdateCultures', this.stateUpdateCultures);
         this.store.registerAction('stateUpdateSelectedCulture', this.stateUpdateSelectedCulture);
         this.store.registerAction('stateRemoveJwt', this.stateRemoveJwt);
+        
+        this.store.dispatch("REHYDRATE_STATE");
     }
 
     // ================================= view lifecycle ===============================
@@ -113,6 +119,7 @@ export class App {
             { route: 'tracks', name: 'tracks-index', moduleId: PLATFORM.moduleName('views/tracks/index'), nav: true, title: 'Tracks' },
             { route: 'tracks/create', name: 'tracks-create', moduleId: PLATFORM.moduleName('views/tracks/create'), nav: false, title: 'Tracks Create' },
             { route: 'track/details/:id?', name: 'track-details', moduleId: PLATFORM.moduleName('views/tracks/details'), nav: false, title: 'Track Details' },
+            { route: 'track/delete/:id?', name: 'track-delete', moduleId: PLATFORM.moduleName('views/tracks/delete'), nav: false, title: 'Track Delete' },
             { route: 'account/login', name: 'account-login', moduleId: PLATFORM.moduleName('views/account/login'), nav: false, title: 'Login' },
             { route: 'account/register', name: 'account-register', moduleId: PLATFORM.moduleName('views/account/register'), nav: false, title: 'Register' },
         ]);

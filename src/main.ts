@@ -44,6 +44,7 @@ switch (logLevel) {
 export function configure(aurelia: Aurelia): void {
   aurelia.use
     .standardConfiguration()
+    .plugin(PLATFORM.moduleName('au-table'))
     .feature(PLATFORM.moduleName('resources/index'));
 
   if (environment.testing) {

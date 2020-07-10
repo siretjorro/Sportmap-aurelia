@@ -9,6 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/leaflet": "^1.5.12",
+    "au-table": "^0.1.14",
     "aurelia-animator-css": "^1.0.4",
     "aurelia-bootstrapper": "^2.3.3",
     "aurelia-fetch-client": "^1.8.2",

@@ -1,4 +1,5 @@
 <template>
+    <require from='/Users/siret/code/javascript/sportmap-aurelia/src/utils/async-binding-behavior'></require>
     <div class="row">
         <div class="col">
           <h1>Tracks</h1>
@@ -9,21 +10,26 @@
           </div>
         </div>
       </div>
-    <table class="table">
+    <table class="table table-striped" aurelia-table="data.bind: tracks; display-data.bind: $displayData">
         <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Name</th>
                 <th scope="col">Description</th>
+                <th scope="col" aut-sort="custom.bind: lengthSort">Trackpoints</th>
+                <th scope="col" aut-sort="custom.bind: lengthSort">Length</th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            <tr repeat.for="track of tracks">
+            <tr repeat.for="track of $displayData">
                 <th scope="row">${track.id}</th>
                 <td>${track.name}</td>
                 <td>${track.description}</td>
-                <td><a route-href="route: track-details; params.bind: { id: track.id }">Details</a></td>
+                <td>${numberOfTrackpoints(track.id) & async}</td>
+                <td>${trackLength(track.id) & async} km</td>
+                <td><a route-href="route: track-details; params.bind: { id: track.id }">Details</a> |
+                    <a route-href="route: track-delete; params.bind: { id: track.id }">Delete</a></td>
             </tr>
         </tbody>
     </table>
