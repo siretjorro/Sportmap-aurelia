@@ -1,3 +1,4 @@
+import { Confirm } from '../../components/confirm/confirm';
 import { TrackPointService } from './../../services/trackpoint-service';
 import { ITrackPoint } from './../../domain/ITrackPoint';
 import { IFetchResponse } from './../../types/IFetchResponse';
@@ -13,6 +14,10 @@ export class Tracks {
     trackPoints: Map<string, ITrackPoint[]> = new Map();
     trackPoints1: ITrackPoint[] = [];
     trackPoints2 = {};
+
+    filters = [
+        { value: '', keys: ['name', 'description'] },
+    ];
 
     constructor(private trackService: TrackService, private trackPointService: TrackPointService) {
     }
@@ -66,8 +71,26 @@ export class Tracks {
 
         return Math.round(trackLength / 1000);
     }
-    
-    lengthSort(a: number, b: number, sortOrder: number): number{
+
+    async delete(id: string): Promise<void> {
+        await this.trackService.delete(id).then(
+            response => {
+                if (response.data) {
+                    console.log("all good");
+                }
+            }
+        );
+
+        await this.trackService.getAll().then(
+            response => {
+                if (response.data) {
+                    this.tracks = response.data;
+                }
+            }
+        );
+    }
+
+    sort(a: number, b: number, sortOrder: number): number {
         if (a === b) {
             return 0;
         }

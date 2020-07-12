@@ -45,6 +45,7 @@ export function configure(aurelia: Aurelia): void {
   aurelia.use
     .standardConfiguration()
     .plugin(PLATFORM.moduleName('au-table'))
+    .plugin(PLATFORM.moduleName('aurelia-dialog'))
     .feature(PLATFORM.moduleName('resources/index'));
 
   if (environment.testing) {

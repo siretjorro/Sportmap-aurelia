@@ -32,8 +32,7 @@ export class BaseService<TEntity> {
         try {
             const response = await this.httpClient
                 .fetch(url, {
-                    cache: "no-store",
-                    // headers: this.authHeaders
+                    cache: "no-store"
                 });
             // happy case
             if (response.ok) {
@@ -63,8 +62,7 @@ export class BaseService<TEntity> {
         try {
             const response = await this.httpClient
                 .fetch(this.apiEndpointUrl + '/' + id, {
-                    cache: "no-store",
-                    headers: this.authHeaders
+                    cache: "no-store"
                 });
             // happy case
             if (response.ok) {
@@ -120,6 +118,33 @@ export class BaseService<TEntity> {
         }
     }
 
+    async delete(id: string): Promise<IFetchResponse<TEntity>> {
+        try {
+            const response = await this.httpClient
+                .delete(this.apiEndpointUrl + '/' + id, {
+                    cache: 'no-store'
+                });
 
+            // happy case
+            if (response.status >= 200 && response.status < 300) {
+                const data = (await response.json()) as TEntity;
+                return {
+                    statusCode: response.status,
+                    data: data
+                }
+            }
 
+            // something went wrong
+            return {
+                statusCode: response.status,
+                errorMessage: response.statusText
+            }
+        }
+        catch (reason) {
+            return {
+                statusCode: 0,
+                errorMessage: JSON.stringify(reason)
+            }
+        }
+    }
 }

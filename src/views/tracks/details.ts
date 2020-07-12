@@ -25,7 +25,7 @@ export class TrackDetails {
     private paceColorGradient: string[] = [];
 
     private _track?: ITrack | null;
-    private _trackpoints: ITrackPoint[] = [];
+    private trackpoints: ITrackPoint[] = [];
 
     constructor(private trackService: TrackService, private trackPointService: TrackPointService) {
         this.paceColorGradient = gradstop({
@@ -40,7 +40,6 @@ export class TrackDetails {
         if (elem) {
             elem.setAttribute('style', 'height: ' + (this.viewportHeight * .8).toString() + 'px;');
         }
-
 
         this.map = L.map('map').setView([59.3953607, 24.6643414], 18);
         //this.map = L.map('map').setView([59.3245441,25.6506961], 14);
@@ -73,7 +72,7 @@ export class TrackDetails {
             this.trackPointService.getAll({ trackId: params.id }).then(
                 response => {
                     if (response.data) {
-                        this._trackpoints = response.data.sort(function (a, b) {
+                        this.trackpoints = response.data.sort(function (a, b) {
                             if (a.passOrder && b.passOrder) {
                                 if (a.passOrder < b.passOrder) {
                                     return -1;
@@ -85,7 +84,6 @@ export class TrackDetails {
                             }
                             return 0;
                         });
-                        console.log(this._trackpoints);
                         this.visualizeSession();
                     }
                 }
@@ -111,8 +109,7 @@ export class TrackDetails {
                         this.trackPointService.getAll({ trackId: this._trackId }).then(
                             response => {
                                 if (response.data) {
-                                    this._trackpoints = response.data;
-                                    console.log(this._trackpoints);
+                                    this.trackpoints = response.data;
                                     this.visualizeSession();
                                 }
                             }
@@ -159,20 +156,19 @@ export class TrackDetails {
         const minPace = 6 * 60;
         const maxPace = 18 * 60;
 
-        const paceBuckets = getColorCodedPolylines2(this._trackpoints, minPace, maxPace, this.paceColorGradient.length);
+        const paceBuckets = getColorCodedPolylines2(this.trackpoints, minPace, maxPace, this.paceColorGradient.length);
 
-        this._trackpoints.forEach((location, index) => {
+        this.trackpoints.forEach((location, index) => {
             polylinePoints.push([location.latitude, location.longitude]);
 
             if (index > 0) {
                 this.trackLength = this.trackLength + distanceBetweenLatLon(
-                    this._trackpoints[index - 1].latitude, this._trackpoints[index - 1].longitude,
+                    this.trackpoints[index - 1].latitude, this.trackpoints[index - 1].longitude,
                     location.latitude, location.longitude);
 
-                console.log(this._trackpoints[index - 1].longitude);
+                console.log(this.trackpoints[index - 1].longitude);
             }
 
-            console.log(location.latitude);
             L.marker([location.latitude, location.longitude], { icon: iconTp }).addTo(this.map);
 
         });
@@ -190,7 +186,7 @@ export class TrackDetails {
         // add start marker
         if (polylinePoints.length > 0) {
             // L.marker([this.gpsLocations[0].latitude, this.gpsLocations[0].longitude], { icon: iconS }).addTo(this.map);
-            this.map.setView([this._trackpoints[0].latitude, this._trackpoints[0].longitude], 15);
+            this.map.setView([this.trackpoints[0].latitude, this.trackpoints[0].longitude], 15);
         }
         // add finish marker
         if (polylinePoints.length > 1) {
@@ -201,5 +197,35 @@ export class TrackDetails {
             const polyline = L.polyline(polylinePoints);
             this.map.fitBounds(polyline.getBounds());
         }
+    }
+
+    async delete(id: string): Promise<void> {
+        await this.trackPointService.delete(id).then(
+            response => {
+                if (response.data) {
+                    console.log("all good");
+                }
+            }
+        );
+
+        this.trackPointService.getAll({ trackId: this._trackId }).then(
+            response => {
+                if (response.data) {
+                    this.trackpoints = response.data.sort(function (a, b) {
+                        if (a.passOrder && b.passOrder) {
+                            if (a.passOrder < b.passOrder) {
+                                return -1;
+                            }
+                            if (a.passOrder > b.passOrder) {
+                                return 1;
+                            }
+
+                        }
+                        return 0;
+                    });
+                    this.visualizeSession();
+                }
+            }
+        );
     }
 }
