@@ -6,10 +6,14 @@ import { TrackService } from './../../services/track-service';
 import { LogManager, autoinject } from 'aurelia-framework';
 import { ITrack } from 'domain/ITrack';
 import { distanceBetweenLatLon, getColorCodedPolylines } from 'utils/utils-leaflet';
+import { numberOfTrackpoints, trackLength } from 'utils/utils-general';
 export const log = LogManager.getLogger('app.App');
 
 @autoinject
 export class Tracks {
+    private _name!: string | null;
+    private _description!: string | null;
+    private _track!: ITrack;
     tracks: ITrack[] = [];
     trackPoints: Map<string, ITrackPoint[]> = new Map();
     trackPoints1: ITrackPoint[] = [];
@@ -36,40 +40,11 @@ export class Tracks {
     }
 
     async numberOfTrackpoints(id: string): Promise<number> {
-        let n = 0;
-
-        await this.trackPointService.getAll({ trackId: id }).then(
-            response => {
-                if (response.data) {
-                    n = response.data.length;
-                }
-            }
-        );
-
-        return n;
+        return numberOfTrackpoints(id, this.trackPointService);
     }
 
     async trackLength(id: string): Promise<number> {
-        let trackPoints: ITrackPoint[] = [];
-        let trackLength = 0;
-
-        await this.trackPointService.getAll({ trackId: id }).then(
-            response => {
-                if (response.data) {
-                    trackPoints = response.data;
-                }
-            }
-        );
-
-        trackPoints.forEach((location, index) => {
-            if (index > 0) {
-                trackLength = trackLength + distanceBetweenLatLon(
-                    trackPoints[index - 1].latitude, trackPoints[index - 1].longitude,
-                    location.latitude, location.longitude);
-            }
-        });
-
-        return Math.round(trackLength / 1000);
+        return trackLength(id, this.trackPointService);
     }
 
     async delete(id: string): Promise<void> {
@@ -100,5 +75,28 @@ export class Tracks {
         }
 
         return -1 * sortOrder;
+    }
+
+    onSubmit(event: Event): void {
+        if (this._name && this._description) {
+            this._track = { name: this._name, description: this._description };
+
+            this.trackService.post(this._track).then(
+                response => {
+                    if (response.data) {
+                        this.trackService.getAll().then(
+                            response => {
+                                if (response.data) {
+                                    this.tracks = response.data;
+                                }
+                            }
+                        );
+                    }
+                }
+            );
+
+            this._name = null;
+            this._description = null;
+        }
     }
 }

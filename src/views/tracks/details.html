@@ -1,36 +1,53 @@
 <template>
     <require from="/Users/siret/code/javascript/sportmap-aurelia/src/components/delete/delete"></require>
-    <form id="trackpoint" method="post" submit.trigger="onSubmit($event)">
-        <h4>Add a new trackpoint</h4>
-        <!-- <h4 if.bind="_errorMessage != null" style="color:red;">${_errorMessage}</h4> -->
-        <hr />
-        <div class="row">
-            <div class="col form-group">
-                <label for="Input_Latitude">Latitude</label>
-                <input class="form-control" type="text" value.bind="_latitude" />
-            </div>
-            <div class="col form-group">
-                <label for="Input_Longitude">Longitude</label>
-                <input class="form-control" type="text" value.bind="_longitude" />
-            </div>
+    <require from='/Users/siret/code/javascript/sportmap-aurelia/src/utils/async-binding-behavior'></require>
+    <div>
+        <h1>Track ${_track.id}</h1>
+        <h4>${numberOfTrackpoints(_track.id) & async} trackpoints,
+        ${trackLength(_track.id) & async} km</h4>
+    </div>
+    <div id="map" class="mt-4"></div>
+    <div class="row mt-4 mb-3">
+        <div class="col">
+            <h4>Trackpoints</h4>
         </div>
-        <div class="row">
-            <div class="col form-group">
-                <label for="Input_Longitude">Accuracy</label>
-                <input class="form-control" type="text" value.bind="_accuracy" />
-            </div>
-            <div class="col form-group">
-                <label for="Input_Longitude">Pass order</label>
-                <input class="form-control" type="text" value.bind="_passOrder" />
-            </div>
+        <div class="col">
+            <button class="btn btn-outline-secondary float-right" type="button" data-toggle="collapse"
+                data-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
+                Add new
+            </button>
         </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">Add</button>
-        </div>
-    </form>
-    <div id="map"></div>
-    <h4 class="mt-4 mb-3">Trackpoints</h4>
-    <table class="table table-striped" aurelia-table="data.bind: trackpoints; display-data.bind: $displayData">
+    </div>
+    <div class="collapse" id="collapseForm">
+        <form id="trackpoint" method="post" submit.trigger="onSubmit($event)">
+            <div class="row">
+                <div class="col form-group">
+                    <label for="Input_Latitude">Latitude</label>
+                    <input class="form-control" type="text" value.bind="_latitude" />
+                    <small id="latitudeHelp" class="form-text text-muted">e.g. 20, 24.5, 38.69</small>
+                </div>
+                <div class="col form-group">
+                    <label for="Input_Longitude">Longitude</label>
+                    <input class="form-control" type="text" value.bind="_longitude" />
+                    <small id="latitudeHelp" class="form-text text-muted">e.g. 20, 24.5, 38.69</small>
+                </div>
+                <div class="col form-group">
+                    <label for="Input_Longitude">Accuracy</label>
+                    <input class="form-control" type="text" value.bind="_accuracy" />
+                    <small id="latitudeHelp" class="form-text text-muted">e.g. 10, 0.9, optional</small>
+                </div>
+                <div class="col form-group">
+                    <label for="Input_Longitude">Pass order</label>
+                    <input class="form-control" type="text" value.bind="_passOrder" />
+                    <small id="latitudeHelp" class="form-text text-muted">Must be an integer, optional</small>
+                </div>
+            </div>
+            <div class="form-group float-right">
+                <button type="submit" class="btn btn-outline-primary">Add</button>
+            </div>
+        </form>
+    </div>
+    <table class="table table-bordered" aurelia-table="data.bind: trackpoints; display-data.bind: $displayData">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -44,7 +61,7 @@
         <tbody>
             <tr repeat.for="trackpoint of $displayData">
                 <th scope="row">${trackpoint.id}</th>
-                <td>${trackpoint.latitude}</td>
+                <td contenteditable='true'>${trackpoint.latitude}</td>
                 <td>${trackpoint.longitude}</td>
                 <td>${trackpoint.accuracy}</td>
                 <td>${trackpoint.passOrder}</td>

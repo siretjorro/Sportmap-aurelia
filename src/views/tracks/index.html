@@ -1,22 +1,56 @@
 <template>
-    <require from="/Users/siret/code/javascript/sportmap-aurelia/src/components/delete/delete"></require>
     <require from='/Users/siret/code/javascript/sportmap-aurelia/src/utils/async-binding-behavior'></require>
+    <require from='/Users/siret/code/javascript/sportmap-aurelia/src/components/delete/delete'></require>
     <div class="row">
         <div class="col">
             <h1>Tracks</h1>
         </div>
         <div class="col">
             <div class="float-right">
-                <a route-href="route: tracks-create" class="btn btn-outline-secondary">Add new</a>
+                <!-- <a route-href="route: tracks-create" class="btn btn-outline-secondary">Filter</a> -->
+                <div class="btn-group">
+                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        Filter
+                    </button>
+                    <form class="dropdown-menu dropdown-menu-right p-4">
+                        <div class="form-group">
+                            <label for="exampleDropdownFormEmail2">Enter name or description to filter</label>
+                            <input type="text" value.bind="filters[0].value" class="form-control" />
+                        </div>
+                    </form>
+                </div>
+                <!-- <a route-href="route: tracks-create" class="btn btn-outline-secondary">Add new</a> -->
+                <button class="btn btn-outline-secondary" type="button" data-toggle="collapse"
+                    data-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
+                    Add new
+                </button>
             </div>
         </div>
     </div>
 
-    <div class="form-group">
-        <input type="text" value.bind="filters[0].value" placeholder="Enter name or description to filter" class="form-control" />
+    <div class="collapse" id="collapseForm">
+        <form id="trackpoint" method="post" submit.trigger="onSubmit($event)">
+            <div class="row">
+                <div class="col-4 form-group">
+                    <label for="Input_Name">Name</label>
+                    <input class="form-control" type="text" value.bind="_description" />
+                    <small id="latitudeHelp" class="form-text text-muted">e.g. 20, 24.5, 38.69</small>
+                </div>
+                <div class="col-8 form-group">
+                    <label for="Input_Description">Description</label>
+                    <input class="form-control" type="text" value.bind="_name" />
+                    <small id="latitudeHelp" class="form-text text-muted">e.g. 20, 24.5, 38.69</small>
+                </div>
+            </div>
+            <div class="form-group float-right">
+                <button type="submit" class="btn btn-outline-primary">Add</button>
+            </div>
+        </form>
     </div>
 
-    <table class="table table-striped" aurelia-table="data.bind: tracks; display-data.bind: $displayData; filters.bind: filters">
+    <table class="table table-bordered mt-3"
+        aurelia-table="data.bind: tracks; display-data.bind: $displayData; filters.bind: filters">
         <thead>
             <tr>
                 <th scope="col">#</th>
@@ -35,8 +69,10 @@
                 <td>${numberOfTrackpoints(track.id) & async}</td>
                 <td>${trackLength(track.id) & async} km</td>
                 <td>
-                    <a route-href="route: track-details; params.bind: { id: track.id }" class="btn btn-outline-primary btn-sm">Details</a> 
-                    <delete msg="Are you sure you want to delete track ${track.name}" action.call="$parent.delete(track.id)"></delete>
+                    <a route-href="route: track-details; params.bind: { id: track.id }"
+                        class="btn btn-outline-primary btn-sm">Details</a>
+                    <delete msg="Are you sure you want to delete track ${track.name}"
+                        action.call="$parent.delete(track.id)"></delete>
                 </td>
             </tr>
         </tbody>

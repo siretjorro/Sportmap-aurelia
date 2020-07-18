@@ -1,4 +1,7 @@
+import { TrackPointService } from './../services/trackpoint-service';
 import { ILogLevel } from "types/ILogLevel";
+import { ITrackPoint } from 'domain/ITrackPoint';
+import { distanceBetweenLatLon } from './utils-leaflet';
 
 export function queryStringValue(variableName: string): string | undefined {
     return location.search
@@ -49,4 +52,41 @@ export function decimalToHex(d: number, padding? : number | null): string {
 export function roundToPrecision(x: number, precision?: number): number {
     const y = +x + (precision === undefined ? 0.5 : precision/2);
     return y - (y % (precision === undefined ? 1 : +precision));
+}
+
+export async function numberOfTrackpoints(id: string, service: TrackPointService): Promise<number> {
+    let n = 0;
+
+    await service.getAll({ trackId: id }).then(
+        response => {
+            if (response.data) {
+                n = response.data.length;
+            }
+        }
+    );
+
+    return n;
+}
+
+export async function trackLength(id: string, service: TrackPointService): Promise<number> {
+    let trackPoints: ITrackPoint[] = [];
+    let trackLength = 0;
+
+    await service.getAll({ trackId: id }).then(
+        response => {
+            if (response.data) {
+                trackPoints = response.data;
+            }
+        }
+    );
+
+    trackPoints.forEach((location, index) => {
+        if (index > 0) {
+            trackLength = trackLength + distanceBetweenLatLon(
+                trackPoints[index - 1].latitude, trackPoints[index - 1].longitude,
+                location.latitude, location.longitude);
+        }
+    });
+
+    return Math.round(trackLength / 1000);
 }

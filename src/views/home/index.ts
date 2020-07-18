@@ -246,8 +246,6 @@ export class HomeIndex {
                 this.trackLength = this.trackLength + distanceBetweenLatLon(
                     this.gpsLocations[index - 1].latitude, this.gpsLocations[index - 1].longitude,
                     location.latitude, location.longitude);
-
-                console.log(this.gpsLocations[index - 1].longitude);
             }
 
             if (location.gpsLocationTypeId == GpsLocationTypes.wayPoint && this.showWp) {

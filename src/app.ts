@@ -117,7 +117,6 @@ export class App {
         config.map([
             { route: ['', 'home'], name: 'home', moduleId: PLATFORM.moduleName('views/home/index'), nav: false, title: 'Home' },
             { route: 'tracks', name: 'tracks-index', moduleId: PLATFORM.moduleName('views/tracks/index'), nav: true, title: 'Tracks' },
-            { route: 'tracks/create', name: 'tracks-create', moduleId: PLATFORM.moduleName('views/tracks/create'), nav: false, title: 'Tracks Create' },
             { route: 'track/details/:id?', name: 'track-details', moduleId: PLATFORM.moduleName('views/tracks/details'), nav: false, title: 'Track Details' },
             { route: 'track/delete/:id?', name: 'track-delete', moduleId: PLATFORM.moduleName('views/tracks/delete'), nav: false, title: 'Track Delete' },
             { route: 'account/login', name: 'account-login', moduleId: PLATFORM.moduleName('views/account/login'), nav: false, title: 'Login' },

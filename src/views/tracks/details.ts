@@ -7,6 +7,7 @@ import { ITrack } from './../../domain/ITrack';
 import gradstop from 'gradstop';
 import * as L from 'leaflet';
 import { distanceBetweenLatLon, getColorCodedPolylines, getColorCodedPolylines2 } from 'utils/utils-leaflet';
+import { numberOfTrackpoints, trackLength } from 'utils/utils-general';
 
 @autoinject
 export class TrackDetails {
@@ -16,16 +17,16 @@ export class TrackDetails {
     private _passOrder!: number | null;
     private _trackPoint!: ITrackPoint;
     private _trackId: string = "";
+    private _track?: ITrack | null = {} as ITrack;
+    private trackpoints: ITrackPoint[] = [];
     map!: L.Map;
 
-    trackLength = 0;
+    length = 0;
     viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
     viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
     private paceColorGradient: string[] = [];
 
-    private _track?: ITrack | null;
-    private trackpoints: ITrackPoint[] = [];
 
     constructor(private trackService: TrackService, private trackPointService: TrackPointService) {
         this.paceColorGradient = gradstop({
@@ -33,6 +34,7 @@ export class TrackDetails {
             inputFormat: 'hex',
             colorArray: ['#00FF00', '#FFFF00', '#FF0000']
         });
+
     }
 
     attached(): void {
@@ -151,7 +153,7 @@ export class TrackDetails {
         });
 
         const polylinePoints: L.LatLngExpression[] = [];
-        this.trackLength = 0;
+        this.length = 0;
 
         const minPace = 6 * 60;
         const maxPace = 18 * 60;
@@ -162,15 +164,18 @@ export class TrackDetails {
             polylinePoints.push([location.latitude, location.longitude]);
 
             if (index > 0) {
-                this.trackLength = this.trackLength + distanceBetweenLatLon(
+                this.length = this.length + distanceBetweenLatLon(
                     this.trackpoints[index - 1].latitude, this.trackpoints[index - 1].longitude,
                     location.latitude, location.longitude);
 
-                console.log(this.trackpoints[index - 1].longitude);
             }
 
-            L.marker([location.latitude, location.longitude], { icon: iconTp }).addTo(this.map);
-
+            L.marker([location.latitude, location.longitude], { icon: iconTp }).bindTooltip(index.toString(),
+                {
+                    permanent: true,
+                    direction: 'bottom'
+                }
+            ).addTo(this.map);
         });
 
         paceBuckets.forEach((paceSegment, bucketNo) => {
@@ -227,5 +232,13 @@ export class TrackDetails {
                 }
             }
         );
+    }
+
+    async numberOfTrackpoints(id: string): Promise<number> {
+        return numberOfTrackpoints(id, this.trackPointService);
+    }
+
+    async trackLength(id: string): Promise<number> {
+        return trackLength(id, this.trackPointService);
     }
 }
