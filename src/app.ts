@@ -118,7 +118,6 @@ export class App {
             { route: ['', 'home'], name: 'home', moduleId: PLATFORM.moduleName('views/home/index'), nav: false, title: 'Home' },
             { route: 'tracks', name: 'tracks-index', moduleId: PLATFORM.moduleName('views/tracks/index'), nav: true, title: 'Tracks' },
             { route: 'track/details/:id?', name: 'track-details', moduleId: PLATFORM.moduleName('views/tracks/details'), nav: false, title: 'Track Details' },
-            { route: 'track/delete/:id?', name: 'track-delete', moduleId: PLATFORM.moduleName('views/tracks/delete'), nav: false, title: 'Track Delete' },
             { route: 'account/login', name: 'account-login', moduleId: PLATFORM.moduleName('views/account/login'), nav: false, title: 'Login' },
             { route: 'account/register', name: 'account-register', moduleId: PLATFORM.moduleName('views/account/register'), nav: false, title: 'Register' },
         ]);

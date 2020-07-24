@@ -1,6 +1,6 @@
 <template>
-    <require from="/Users/siret/code/javascript/sportmap-aurelia/src/components/delete/delete"></require>
-    <require from='/Users/siret/code/javascript/sportmap-aurelia/src/utils/async-binding-behavior'></require>
+    <require from="../../components/delete/delete"></require>
+    <require from='../../utils/async-binding-behavior'></require>
     <div>
         <h1>Track ${_track.id}</h1>
         <h4>${numberOfTrackpoints(_track.id) & async} trackpoints,
@@ -14,7 +14,7 @@
         <div class="col">
             <button class="btn btn-outline-secondary float-right" type="button" data-toggle="collapse"
                 data-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
-                Add new
+                Add
             </button>
         </div>
     </div>
@@ -59,16 +59,27 @@
             </tr>
         </thead>
         <tbody>
-            <tr repeat.for="trackpoint of $displayData">
+            <tr repeat.for="trackpoint of $displayData" aut-select="row.bind: trackpoint; custom.bind: true; mode: single"
+            select.delegate="rowSelected($event)">
                 <th scope="row">${trackpoint.id}</th>
-                <td contenteditable='true'>${trackpoint.latitude}</td>
-                <td>${trackpoint.longitude}</td>
-                <td>${trackpoint.accuracy}</td>
-                <td>${trackpoint.passOrder}</td>
+                <td class="trackpoint-cell" if.bind="editing !== trackpoint">${trackpoint.latitude}</td>
+                <td class="trackpoint-cell" if.bind="editing !== trackpoint">${trackpoint.longitude}</td>
+                <td class="trackpoint-cell" if.bind="editing !== trackpoint">${trackpoint.accuracy}</td>
+                <td class="trackpoint-cell" if.bind="editing !== trackpoint">${trackpoint.passOrder}</td>
+
+                <td if.bind="editing === trackpoint"><input class="trackpoint-input" value.bind="trackpoint.latitude" type="text"></td>
+                <td if.bind="editing === trackpoint"><input class="trackpoint-input" value.bind="trackpoint.longitude" type="text"></td>
+                <td if.bind="editing === trackpoint"><input class="trackpoint-input" value.bind="trackpoint.accuracy" type="text"></td>
+                <td if.bind="editing === trackpoint"><input class="trackpoint-input" value.bind="trackpoint.passOrder" type="text"></td>
+
                 <td>
+                    <!-- <input type="checkbox" checked.bind="trackpoint.$isSelected"/> -->
+                    <a if.bind="editing !== trackpoint" class="btn btn-outline-secondary btn-sm" click.delegate="trackpoint.$isSelected = true">Edit</a>
+                    <a if.bind="editing === trackpoint" class="btn btn-outline-secondary btn-sm" click.delegate="update(trackpoint)">Save</a>
                     <delete msg="Are you sure you want to delete this trackpoint"
                         action.call="$parent.delete(trackpoint.id)"></delete>
                 </td>
+
             </tr>
         </tbody>
     </table>

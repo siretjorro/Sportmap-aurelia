@@ -18,6 +18,7 @@ export class Tracks {
     trackPoints: Map<string, ITrackPoint[]> = new Map();
     trackPoints1: ITrackPoint[] = [];
     trackPoints2 = {};
+    editing = null;
 
     filters = [
         { value: '', keys: ['name', 'description'] },
@@ -98,5 +99,16 @@ export class Tracks {
             this._name = null;
             this._description = null;
         }
+    }
+
+    rowSelected($event: { detail: { row: any } }): void {
+        console.log("selected");
+        this.editing = $event.detail.row;
+    }
+
+    update(track: ITrack): void {
+        const tr = { id: track.id, name: track.name, description: track.description };
+        this.trackService.put(tr);
+        this.editing = null;
     }
 }

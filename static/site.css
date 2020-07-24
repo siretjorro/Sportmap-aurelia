@@ -44,3 +44,31 @@ body {
 .dropdown-menu {
     width: 300px;
 }
+
+.info {
+    background-color: lightblue;
+}
+
+.trackpoint-cell {
+    width: 130px;
+}
+
+.trackpoint-input {
+    width: 75px;
+}
+
+.track-cell {
+    width: 200px;
+}
+
+.track-input {
+    width: 150px;
+}
+
+.button-cell {
+    width: 210px;
+}
+
+.id-cell {
+    width: 250px;
+}

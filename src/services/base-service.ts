@@ -118,6 +118,36 @@ export class BaseService<TEntity> {
         }
     }
 
+    async put(obj: any): Promise<IFetchResponse<TEntity>> {
+        try {
+            const response = await this.httpClient
+                .put(this.apiEndpointUrl + '/' + obj.id, JSON.stringify(obj), {
+                    cache: 'no-store'
+                });
+
+            // happy case
+            if (response.status >= 200 && response.status < 300) {
+                const data = (await response.json()) as TEntity;
+                return {
+                    statusCode: response.status,
+                    data: data
+                }
+            }
+
+            // something went wrong
+            return {
+                statusCode: response.status,
+                errorMessage: response.statusText
+            }
+        }
+        catch (reason) {
+            return {
+                statusCode: 0,
+                errorMessage: JSON.stringify(reason)
+            }
+        }
+    }
+
     async delete(id: string): Promise<IFetchResponse<TEntity>> {
         try {
             const response = await this.httpClient

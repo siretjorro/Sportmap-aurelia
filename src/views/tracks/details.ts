@@ -6,7 +6,7 @@ import { TrackService } from './../../services/track-service';
 import { ITrack } from './../../domain/ITrack';
 import gradstop from 'gradstop';
 import * as L from 'leaflet';
-import { distanceBetweenLatLon, getColorCodedPolylines, getColorCodedPolylines2 } from 'utils/utils-leaflet';
+import { distanceBetweenLatLon, getColorCodedPolylines2 } from 'utils/utils-leaflet';
 import { numberOfTrackpoints, trackLength } from 'utils/utils-general';
 
 @autoinject
@@ -16,6 +16,8 @@ export class TrackDetails {
     private _accuracy!: number | null;
     private _passOrder!: number | null;
     private _trackPoint!: ITrackPoint;
+    editing = null;
+    private trackpointEditing!: ITrackPoint | null;
     private _trackId: string = "";
     private _track?: ITrack | null = {} as ITrack;
     private trackpoints: ITrackPoint[] = [];
@@ -59,7 +61,7 @@ export class TrackDetails {
         if (params.id && typeof (params.id) == 'string') {
             this._trackId = params.id;
 
-            this.trackService.get(params.id).then(
+            this.trackService.get(this._trackId).then(
                 response => {
                     if (response.statusCode >= 200 && response.statusCode < 300) {
                         if (response.data) {
@@ -71,7 +73,7 @@ export class TrackDetails {
                 }
             );
 
-            this.trackPointService.getAll({ trackId: params.id }).then(
+            this.trackPointService.getAll({ trackId: this._trackId }).then(
                 response => {
                     if (response.data) {
                         this.trackpoints = response.data.sort(function (a, b) {
@@ -240,5 +242,15 @@ export class TrackDetails {
 
     async trackLength(id: string): Promise<number> {
         return trackLength(id, this.trackPointService);
+    }
+
+    rowSelected($event: { detail: { row: any } }): void {
+        this.editing = $event.detail.row;
+    }
+
+    update(trackpoint: ITrackPoint): void {
+        const tp = { id: trackpoint.id, latitude: Number(trackpoint.latitude), longitude: Number(trackpoint.longitude), accuracy: Number(trackpoint.accuracy), passOrder: Number(trackpoint.passOrder), trackId: trackpoint.trackId };
+        this.trackPointService.put(tp);
+        this.editing = null;
     }
 }

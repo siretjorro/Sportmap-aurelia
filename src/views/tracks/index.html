@@ -1,6 +1,6 @@
 <template>
-    <require from='/Users/siret/code/javascript/sportmap-aurelia/src/utils/async-binding-behavior'></require>
-    <require from='/Users/siret/code/javascript/sportmap-aurelia/src/components/delete/delete'></require>
+    <require from="../../components/delete/delete"></require>
+    <require from='../../utils/async-binding-behavior'></require>
     <div class="row">
         <div class="col">
             <h1>Tracks</h1>
@@ -62,15 +62,22 @@
             </tr>
         </thead>
         <tbody>
-            <tr repeat.for="track of $displayData">
-                <th scope="row">${track.id}</th>
-                <td>${track.name}</td>
-                <td>${track.description}</td>
+            <tr repeat.for="track of $displayData" aut-select="row.bind: track; custom.bind: true; mode: single"
+            select.delegate="rowSelected($event)">
+                <th class="id-cell" scope="row">${track.id}</th>
+                <td class="track-cell" if.bind="editing !== track">${track.name}</td>
+                <td class="track-cell" if.bind="editing !== track">${track.description}</td>
+                <td if.bind="editing === track"><input class="track-input" value.bind="track.name" type="text"></td>
+                <td if.bind="editing === track"><input class="track-input" value.bind="track.description" type="text"></td>
                 <td>${numberOfTrackpoints(track.id) & async}</td>
                 <td>${trackLength(track.id) & async} km</td>
-                <td>
+                <td class="button-cell">
                     <a route-href="route: track-details; params.bind: { id: track.id }"
                         class="btn btn-outline-primary btn-sm">Details</a>
+                    <a if.bind="editing !== track" class="btn btn-outline-secondary btn-sm"
+                        click.delegate="track.$isSelected = true">Edit</a>
+                    <a if.bind="editing === track" class="btn btn-outline-secondary btn-sm"
+                        click.delegate="update(track)">Save</a>
                     <delete msg="Are you sure you want to delete track ${track.name}"
                         action.call="$parent.delete(track.id)"></delete>
                 </td>
