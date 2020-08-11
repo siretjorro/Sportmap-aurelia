@@ -5,7 +5,7 @@ import { RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { TrackService } from './../../services/track-service';
 import { ITrack } from './../../domain/ITrack';
 import * as L from 'leaflet';
-import { distanceBetweenLatLon, getColorCodedPolylines2 } from 'utils/utils-leaflet';
+import { distanceBetweenLatLon } from 'utils/utils-leaflet';
 import { getNumberOfTrackpoints, getTrackLength } from 'utils/utils-general';
 
 export const log = LogManager.getLogger('app.HomeIndex');
@@ -189,11 +189,6 @@ export class TrackDetails {
         const polylinePoints: L.LatLngExpression[] = [];
         this.trackLength = 0;
 
-        const minPace = 6 * 60;
-        const maxPace = 18 * 60;
-
-        const paceBuckets = getColorCodedPolylines2(this.trackpoints, minPace, maxPace);
-
         this.trackpoints.forEach((location, index) => {
             polylinePoints.push([location.latitude, location.longitude]);
 
@@ -211,21 +206,10 @@ export class TrackDetails {
                 }
             ).addTo(this.map);
         });
-
-        paceBuckets.forEach((paceSegment, bucketNo) => {
-            paceSegment.forEach(lineSegment => {
-                const polyline = L.polyline(lineSegment).setStyle({
-                    color: "#ff9933",
-                    weight: 5
-                }).addTo(this.map);
-            })
-        })
-
-
+        
         // set view to polyline
         if (polylinePoints.length > 0) {
-            this.map.setView([this.trackpoints[0].latitude, this.trackpoints[0].longitude], 15);
-            const polyline = L.polyline(polylinePoints);
+            const polyline = L.polyline(polylinePoints, {color: '#ff6600'}).addTo(this.map);
             this.map.fitBounds(polyline.getBounds());
         }
     }
