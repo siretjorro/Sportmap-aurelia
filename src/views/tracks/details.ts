@@ -110,7 +110,7 @@ export class TrackDetails {
                             return 0;
                         });
 
-                        this.visualizeSession();
+                        this.visualizeTrack();
                     }
                 }
             );
@@ -146,7 +146,7 @@ export class TrackDetails {
                             response => {
                                 if (response.data) {
                                     this.trackpoints = response.data;
-                                    this.visualizeSession();
+                                    this.visualizeTrack();
                                 }
                             }
                         );
@@ -177,7 +177,7 @@ export class TrackDetails {
         }
     }
 
-    visualizeSession(): void {
+    visualizeTrack(): void {
         this.clearMap();
 
         const iconTp = L.icon({
@@ -239,7 +239,7 @@ export class TrackDetails {
                         return 0;
                     });
 
-                    this.visualizeSession();
+                    this.visualizeTrack();
                 }
             }
         );
