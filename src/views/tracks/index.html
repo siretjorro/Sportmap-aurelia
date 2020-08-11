@@ -7,7 +7,6 @@
         </div>
         <div class="col">
             <div class="float-right">
-                <!-- <a route-href="route: tracks-create" class="btn btn-outline-secondary">Filter</a> -->
                 <div class="btn-group">
                     <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
@@ -20,10 +19,9 @@
                         </div>
                     </form>
                 </div>
-                <!-- <a route-href="route: tracks-create" class="btn btn-outline-secondary">Add new</a> -->
                 <button class="btn btn-outline-secondary" type="button" data-toggle="collapse"
                     data-target="#collapseForm" aria-expanded="false" aria-controls="collapseForm">
-                    Add new
+                    Add
                 </button>
             </div>
         </div>
@@ -69,8 +67,8 @@
                 <td class="track-cell" if.bind="editing !== track">${track.description}</td>
                 <td if.bind="editing === track"><input class="track-input" value.bind="track.name" type="text"></td>
                 <td if.bind="editing === track"><input class="track-input" value.bind="track.description" type="text"></td>
-                <td>${numberOfTrackpoints(track.id) & async}</td>
-                <td>${trackLength(track.id) & async} km</td>
+                <td>${getNumberOfTrackpoints(track.id) & async}</td>
+                <td>${getTrackLength(track.id) & async} km</td>
                 <td class="button-cell">
                     <a route-href="route: track-details; params.bind: { id: track.id }"
                         class="btn btn-outline-primary btn-sm">Details</a>

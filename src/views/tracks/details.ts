@@ -1,13 +1,15 @@
 import { ITrackPoint } from './../../domain/ITrackPoint';
 import { TrackPointService } from './../../services/trackpoint-service';
-import { autoinject, observable } from 'aurelia-framework';
+import { autoinject, LogManager, View } from 'aurelia-framework';
 import { RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { TrackService } from './../../services/track-service';
 import { ITrack } from './../../domain/ITrack';
-import gradstop from 'gradstop';
 import * as L from 'leaflet';
 import { distanceBetweenLatLon, getColorCodedPolylines2 } from 'utils/utils-leaflet';
-import { numberOfTrackpoints, trackLength } from 'utils/utils-general';
+import { getNumberOfTrackpoints, getTrackLength } from 'utils/utils-general';
+
+export const log = LogManager.getLogger('app.HomeIndex');
+
 
 @autoinject
 export class TrackDetails {
@@ -15,38 +17,42 @@ export class TrackDetails {
     private _longitude!: number | null;
     private _accuracy!: number | null;
     private _passOrder!: number | null;
+
     private _trackPoint!: ITrackPoint;
+
     editing = null;
-    private trackpointEditing!: ITrackPoint | null;
+    private trackpointInEditing!: ITrackPoint | null;
+
     private _trackId: string = "";
     private _track?: ITrack | null = {} as ITrack;
     private trackpoints: ITrackPoint[] = [];
-    map!: L.Map;
+    trackLength = 0;
 
-    length = 0;
+    map!: L.Map;
     viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
     viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
-    private paceColorGradient: string[] = [];
-
-
     constructor(private trackService: TrackService, private trackPointService: TrackPointService) {
-        this.paceColorGradient = gradstop({
-            stops: 256,
-            inputFormat: 'hex',
-            colorArray: ['#00FF00', '#FFFF00', '#FF0000']
-        });
+    }
 
+    // ================================= view lifecycle ===============================
+    created(owningView: View, myView: View): void {
+        log.debug("created");
+    }
+
+    bind(bindingContext: Record<string, any>, overrideContext: Record<string, any>): void {
+        log.debug("bind");
     }
 
     attached(): void {
+        log.debug("attached");
+
         const elem = document.querySelector('#map');
         if (elem) {
             elem.setAttribute('style', 'height: ' + (this.viewportHeight * .8).toString() + 'px;');
         }
 
         this.map = L.map('map').setView([59.3953607, 24.6643414], 18);
-        //this.map = L.map('map').setView([59.3245441,25.6506961], 14);
 
         L.tileLayer(
             'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -57,7 +63,22 @@ export class TrackDetails {
 
     }
 
+    detached(): void {
+        log.debug("detached");
+    }
+
+    unbind(): void {
+        log.debug("unbind");
+    }
+
+    // ================================= Route lifecycle  ===============================
+    canActivate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): void {
+        log.debug("canActivate");
+    }
+
     activate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): void {
+        log.debug("activate");
+
         if (params.id && typeof (params.id) == 'string') {
             this._trackId = params.id;
 
@@ -88,12 +109,23 @@ export class TrackDetails {
                             }
                             return 0;
                         });
+
                         this.visualizeSession();
                     }
                 }
             );
         }
     }
+
+    canDeactivate(): void {
+        log.debug("canDeactivate");
+    }
+
+    deactivate(): void {
+        log.debug("deactivate");
+    }
+
+    // ================================= Helpers  ===============================
 
     onSubmit(event: Event): void {
         if (this._latitude && this._longitude) {
@@ -155,18 +187,18 @@ export class TrackDetails {
         });
 
         const polylinePoints: L.LatLngExpression[] = [];
-        this.length = 0;
+        this.trackLength = 0;
 
         const minPace = 6 * 60;
         const maxPace = 18 * 60;
 
-        const paceBuckets = getColorCodedPolylines2(this.trackpoints, minPace, maxPace, this.paceColorGradient.length);
+        const paceBuckets = getColorCodedPolylines2(this.trackpoints, minPace, maxPace);
 
         this.trackpoints.forEach((location, index) => {
             polylinePoints.push([location.latitude, location.longitude]);
 
             if (index > 0) {
-                this.length = this.length + distanceBetweenLatLon(
+                this.trackLength = this.trackLength + distanceBetweenLatLon(
                     this.trackpoints[index - 1].latitude, this.trackpoints[index - 1].longitude,
                     location.latitude, location.longitude);
 
@@ -183,24 +215,16 @@ export class TrackDetails {
         paceBuckets.forEach((paceSegment, bucketNo) => {
             paceSegment.forEach(lineSegment => {
                 const polyline = L.polyline(lineSegment).setStyle({
-                    color: this.paceColorGradient[bucketNo],
+                    color: "#ff9933",
                     weight: 5
                 }).addTo(this.map);
             })
         })
 
 
-        // add start marker
+        // set view to polyline
         if (polylinePoints.length > 0) {
-            // L.marker([this.gpsLocations[0].latitude, this.gpsLocations[0].longitude], { icon: iconS }).addTo(this.map);
             this.map.setView([this.trackpoints[0].latitude, this.trackpoints[0].longitude], 15);
-        }
-        // add finish marker
-        if (polylinePoints.length > 1) {
-            // L.marker([this.gpsLocations[this.gpsLocations.length - 1].latitude, this.gpsLocations[this.gpsLocations.length - 1].longitude], { icon: iconF }).addTo(this.map);
-        }
-
-        if (polylinePoints.length > 0) {
             const polyline = L.polyline(polylinePoints);
             this.map.fitBounds(polyline.getBounds());
         }
@@ -230,18 +254,19 @@ export class TrackDetails {
                         }
                         return 0;
                     });
+
                     this.visualizeSession();
                 }
             }
         );
     }
 
-    async numberOfTrackpoints(id: string): Promise<number> {
-        return numberOfTrackpoints(id, this.trackPointService);
+    async getNumberOfTrackpoints(id: string): Promise<number> {
+        return getNumberOfTrackpoints(id, this.trackPointService);
     }
 
-    async trackLength(id: string): Promise<number> {
-        return trackLength(id, this.trackPointService);
+    async getTrackLength(id: string): Promise<number> {
+        return getTrackLength(id, this.trackPointService);
     }
 
     rowSelected($event: { detail: { row: any } }): void {

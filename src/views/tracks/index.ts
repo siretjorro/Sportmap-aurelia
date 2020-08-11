@@ -1,12 +1,13 @@
+import { RouteConfig, NavigationInstruction } from 'aurelia-router';
 import { Confirm } from '../../components/confirm/confirm';
 import { TrackPointService } from './../../services/trackpoint-service';
 import { ITrackPoint } from './../../domain/ITrackPoint';
 import { IFetchResponse } from './../../types/IFetchResponse';
 import { TrackService } from './../../services/track-service';
-import { LogManager, autoinject } from 'aurelia-framework';
+import { LogManager, autoinject, View } from 'aurelia-framework';
 import { ITrack } from 'domain/ITrack';
 import { distanceBetweenLatLon, getColorCodedPolylines } from 'utils/utils-leaflet';
-import { numberOfTrackpoints, trackLength } from 'utils/utils-general';
+import { getNumberOfTrackpoints, getTrackLength } from 'utils/utils-general';
 export const log = LogManager.getLogger('app.App');
 
 @autoinject
@@ -28,6 +29,13 @@ export class Tracks {
     }
 
     // ================================= view lifecycle ===============================
+    created(owningView: View, myView: View): void {
+        log.debug("created");
+    }
+
+    bind(bindingContext: Record<string, any>, overrideContext: Record<string, any>): void {
+        log.debug("bind");
+    }
     async attached(): Promise<void> {
         log.debug("attached");
 
@@ -40,12 +48,38 @@ export class Tracks {
         );
     }
 
-    async numberOfTrackpoints(id: string): Promise<number> {
-        return numberOfTrackpoints(id, this.trackPointService);
+    detached(): void {
+        log.debug("detached");
     }
 
-    async trackLength(id: string): Promise<number> {
-        return trackLength(id, this.trackPointService);
+    unbind(): void {
+        log.debug("unbind");
+    }
+
+    // ================================= Route lifecycle  ===============================
+    canActivate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): void {
+        log.debug("canActivate");
+    }
+
+    activate(params: any, routeConfig: RouteConfig, navigationInstruction: NavigationInstruction): void {
+        log.debug("activate");
+    }
+
+    canDeactivate(): void {
+        log.debug("canDeactivate");
+    }
+
+    deactivate(): void {
+        log.debug("deactivate");
+    }
+
+    // ================================= Helpers  ===============================
+    async getNumberOfTrackpoints(id: string): Promise<number> {
+        return getNumberOfTrackpoints(id, this.trackPointService);
+    }
+
+    async getTrackLength(id: string): Promise<number> {
+        return getTrackLength(id, this.trackPointService);
     }
 
     async delete(id: string): Promise<void> {
@@ -102,13 +136,11 @@ export class Tracks {
     }
 
     rowSelected($event: { detail: { row: any } }): void {
-        console.log("selected");
         this.editing = $event.detail.row;
     }
 
     update(track: ITrack): void {
-        const tr = { id: track.id, name: track.name, description: track.description };
-        this.trackService.put(tr);
+        this.trackService.put(track);
         this.editing = null;
     }
 }

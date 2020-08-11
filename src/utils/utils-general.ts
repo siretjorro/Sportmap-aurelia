@@ -54,7 +54,7 @@ export function roundToPrecision(x: number, precision?: number): number {
     return y - (y % (precision === undefined ? 1 : +precision));
 }
 
-export async function numberOfTrackpoints(id: string, service: TrackPointService): Promise<number> {
+export async function getNumberOfTrackpoints(id: string, service: TrackPointService): Promise<number> {
     let n = 0;
 
     await service.getAll({ trackId: id }).then(
@@ -68,7 +68,7 @@ export async function numberOfTrackpoints(id: string, service: TrackPointService
     return n;
 }
 
-export async function trackLength(id: string, service: TrackPointService): Promise<number> {
+export async function getTrackLength(id: string, service: TrackPointService): Promise<number> {
     let trackPoints: ITrackPoint[] = [];
     let trackLength = 0;
 
